@@ -1,0 +1,18 @@
+{
+    "name": "polyratings",
+    "version": "1",
+    "content_scripts": [
+    {
+        "matches": ["https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&*"],
+        "all_frames": true,
+        "run_at": "document_end",
+        "js": ["main.js"]
+    }
+    ],
+    "host_permissions": [
+        "https://cmsweb.pscs.calpoly.edu/*",
+        "https://www.polyratings.com/*"
+    ],
+    "manifest_version": 3
+}
+    
