@@ -7,20 +7,28 @@ addEval = (document) => {
         let rating = "3.5"; // placeholder
         let profArr = findProfs(section.innerText); 
         if (profArr != null) {
+            let newElement = document.createElement("span");
+            color = setTierColor(parseFloat(rating));
+            newElement.setAttribute("style", `background-color: ${color}`);
             // two profs
-            if (profArr.length == 2) {
-                let newElement = document.createElement("span");
+            if (profArr.length == 2) 
                 newElement.innerHTML = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
-                section.parentNode.replaceChild(newElement, section);
-            }
             // only one prof
-            else {
-                let newElement = document.createElement("span");
+            else 
                 newElement.innerHTML = `${section.innerHTML} (${rating})`;
-                section.parentNode.replaceChild(newElement, section);
-            }
+            section.parentNode.replaceChild(newElement, section);
         }
     }));
+}
+
+// sets color based on rating tier
+setTierColor = (rating) => {
+    let upper = "#D4E9B8"; // green
+    let mid = "#F4D48B"; // yellow-orange
+    let bottom = "#F8B0B0"; // red
+    return rating >= 3.5 ? upper
+        : rating >= 2.5 ? mid
+        : bottom;
 }
 
 // returns array of professors
