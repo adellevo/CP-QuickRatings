@@ -1,56 +1,73 @@
 // sectionArr = array of sections
 // profArr = array of profs for that section
+
 addEval = (document) => {
-    const sectionArr = document.querySelectorAll('[id^="MTG_INSTR"]');
+    const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
+
     sectionArr.forEach(((section) => {
         // page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
         let rating = "3.5"; // placeholder
         let profArr = findProfs(section.innerText); 
+        console.log(profArr);
         if (profArr != null) {
-            let newElement = document.createElement("span");
-            color = setTierColor(parseFloat(rating));
-            newElement.setAttribute("style", `background-color: ${color}`);
+            // let newElement = document.createElement("span");
+            let descSpan = section.getElementsByTagName('span')[0];
+            // console.log(descSpan);
             // two profs
             if (profArr.length == 2) {
-                newElement.innerHTML = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
+                descSpan.innerText = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
             }
             // only one prof
             else {
-                newElement.innerHTML = `${section.innerHTML} (${rating})`;
+                console.log(descSpan);
+                descSpan.innerText = `${profArr[0]} (${rating})`;
             }
-            section.parentNode.replaceChild(newElement, section);
-            section.addEventListener('mouseover', () => {
-                alert("button clicked");
-            });
+            color = setTierColor(parseFloat(rating));
+            descSpan.setAttribute("style", `background-color: ${color}`);
+            let popup = initPopup(document);
+            // window.onload = ('load', function() {
+            //     section.addEventListener("mouseover", mouseOver(popup));
+            //     section.addEventListener("mouseout", mouseOut(popup));
+            //     // section.append(popup); 
+            // });
+            section.append(popup); 
+            // section.parentNode.replaceChild(newElement, section);
         }
     }));
 }
 
-// function myAlert(){
-//     alert('hello world');
-// }
+initPopup = (document) => {
+    // console.log("shouldn't be here");
+    let popup = document.createElement("div");
+    popup.setAttribute("style", "background-color: lightblue");
+    popup.style.display = "block"; 
+    popup.style.width = "200px";
+    
+    // fill popup with data
+    const overview = [
+        "37 evaluations", 
+        "Recognizes Student Difficulties: 3.27", 
+        "Presents Material Clearly: 3.35"
+    ];
+    overview.forEach((subrating) => {
+    popup.appendChild(document.createTextNode(subrating));
+        popup.appendChild(document.createElement("br"));
+    });
+    
+    // add event listeners for popup
+    // mouseOver = () => {
+    //     popup.style.display = "block";
+    //     console.log("blockkk");
+    // }
+    // mouseOut = () => {
+    //     popup.style.display = "none";
+    //     console.log("noneee");
+    // }
+    // popup.addEventListener("mouseover", mouseOver());
+    // popup.addEventListener("mouseout", mouseOut());
 
-// document.addEventListener('DOMContentLoaded', function () {
-//     document.getElementById('alertButton').addEventListener('click', myAlert);
-// });
-
-// let test = document.querySelector('[id^="MTG_INSTR"]');
-
-// changeColor = (element) => {
-//     console.log("helloooo in popup rn");
-//     element.style.color = "purple";
-// }
-
-// popupListener = (element) => {
-//     console.log("helloooo in popup rn");
-//     // This handler will be executed only once when the cursor
-//     // moves over the unordered list
-//     element.addEventListener("mouseover", function( event ) {
-//         // console.log("hello");
-//         // highlight the mouseenter target
-//         event.target.style.color = "purple";
-//     }, false);
-// }
+    return popup;
+}
 
 // sets color based on rating tier
 setTierColor = (rating) => {
@@ -67,8 +84,13 @@ findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : n
 
 setup = () => {
     addEval(document);
-    setTimeout(setup, 2000);
+    setTimeout(setup, 1000);
     // funcName("https://www.polyratings.com/list.html")
 }
 console.log("start");
 setup();
+
+// window.addEventListener('load',function(){
+//     document.getElementById("id1").addEventListener("click", click_handler1, false);
+//     document.getElementById("id2").addEventListener("click", click_handler2, false);
+// });
