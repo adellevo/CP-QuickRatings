@@ -1,58 +1,60 @@
 // sectionArr = array of sections
 // profArr = array of profs for that section
 
-addEval = (document) => {
+addEval = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
-
     sectionArr.forEach(((section) => {
-        // page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
+        page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
         let rating = "3.5"; // placeholder
         let profArr = findProfs(section.innerText); 
-        console.log(profArr);
+        
         if (profArr != null) {
-            // let newElement = document.createElement("span");
-            let descSpan = section.getElementsByTagName('span')[0];
-            // console.log(descSpan);
+            let newElement = document.createElement("span");
             // two profs
             if (profArr.length == 2) {
-                descSpan.innerText = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
+                newElement.innerText = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
             }
             // only one prof
             else {
-                console.log(descSpan);
-                descSpan.innerText = `${profArr[0]} (${rating})`;
+                newElement.innerText = `${profArr[0]} (${rating})`;
             }
             color = setTierColor(parseFloat(rating));
-            descSpan.setAttribute("style", `background-color: ${color}`);
-            let popup = initPopup(document);
+            newElement.setAttribute("style", `background-color: ${color}`);
+
+            let popup = initPopup();
+            section.parentNode.appendChild(popup); 
+            section.parentNode.replaceChild(newElement, section);
+            
             // window.onload = ('load', function() {
             //     section.addEventListener("mouseover", mouseOver(popup));
             //     section.addEventListener("mouseout", mouseOut(popup));
             //     // section.append(popup); 
             // });
-            section.append(popup); 
-            // section.parentNode.replaceChild(newElement, section);
         }
     }));
 }
 
-initPopup = (document) => {
-    // console.log("shouldn't be here");
+initPopup = () => {
+    // create popup
     let popup = document.createElement("div");
     popup.setAttribute("style", "background-color: lightblue");
     popup.style.display = "block"; 
-    popup.style.width = "200px";
+    // popup.style.width = "200px";
     
-    // fill popup with data
+    // fill popup with subrating data
     const overview = [
-        "37 evaluations", 
-        "Recognizes Student Difficulties: 3.27", 
-        "Presents Material Clearly: 3.35"
+        "Clarity: 3.4",
+        "Helpfulness: 3.3",
     ];
     overview.forEach((subrating) => {
-    popup.appendChild(document.createTextNode(subrating));
+        popup.appendChild(document.createTextNode(subrating));
         popup.appendChild(document.createElement("br"));
     });
+
+    // PolyRatings link
+    const anchor = document.createElement('a');
+    anchor.innerHTML = '<a href="https://www.polyratings.com/list.html" target="_blank"> View on PolyRatings </a>';
+    popup.appendChild(anchor);
     
     // add event listeners for popup
     // mouseOver = () => {
@@ -83,7 +85,7 @@ setTierColor = (rating) => {
 findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : name.split(','));
 
 setup = () => {
-    addEval(document);
+    addEval();
     setTimeout(setup, 1000);
     // funcName("https://www.polyratings.com/list.html")
 }
