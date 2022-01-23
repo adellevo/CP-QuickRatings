@@ -36,7 +36,22 @@ findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : n
 
 setup = () => {
     addEval(document);
+    getProfessorInfo();
     setTimeout(setup, 1000);
     // funcName("https://www.polyratings.com/list.html")
+}
+
+getProfessorInfo = () => {
+    chrome.runtime.sendMessage(
+        {
+            method: 'GET',
+            url: 'https://www.polyratings.com/eval/2073/index.html',
+        },
+        (response) => {
+            if (response != "error") {
+                console.log(response);
+            }
+        }
+    );
 }
 setup();
