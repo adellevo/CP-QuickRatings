@@ -13,6 +13,9 @@
         "https://cmsweb.pscs.calpoly.edu/*",
         "https://www.polyratings.com/*"
     ],
-    "manifest_version": 3
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    }
 }
     
