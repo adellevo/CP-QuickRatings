@@ -1,10 +1,9 @@
 // sectionArr = array of sections
 // profArr = array of profs for that section
-
 addEval = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
     sectionArr.forEach(((section) => {
-        page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
+        // page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
         let rating = "3.5"; // placeholder
         let profArr = findProfs(section.innerText); 
         
@@ -21,26 +20,20 @@ addEval = () => {
             color = setTierColor(parseFloat(rating));
             newElement.setAttribute("style", `background-color: ${color}`);
 
-            let popup = initPopup();
-            section.parentNode.appendChild(popup); 
-            section.parentNode.replaceChild(newElement, section);
-            
-            // window.onload = ('load', function() {
-            //     section.addEventListener("mouseover", mouseOver(popup));
-            //     section.addEventListener("mouseout", mouseOut(popup));
-            //     // section.append(popup); 
-            // });
+            let profContainer = section.parentNode;
+            let popup = initPopup(profContainer);
+            profContainer.appendChild(popup); 
+            profContainer.replaceChild(newElement, section);
         }
     }));
 }
 
-initPopup = () => {
+initPopup = (profContainer) => {
     // create popup
     let popup = document.createElement("div");
     popup.setAttribute("style", "background-color: lightblue");
-    popup.style.display = "block"; 
-    // popup.style.width = "200px";
-    
+    popup.style.display = "none"; 
+
     // fill popup with subrating data
     const overview = [
         "Clarity: 3.4",
@@ -57,16 +50,10 @@ initPopup = () => {
     popup.appendChild(anchor);
     
     // add event listeners for popup
-    // mouseOver = () => {
-    //     popup.style.display = "block";
-    //     console.log("blockkk");
-    // }
-    // mouseOut = () => {
-    //     popup.style.display = "none";
-    //     console.log("noneee");
-    // }
-    // popup.addEventListener("mouseover", mouseOver());
-    // popup.addEventListener("mouseout", mouseOut());
+    handleMouseOver = () => popup.style.display = "block";
+    handleMouseOut = () => popup.style.display = "none";
+    profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
+    profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
 
     return popup;
 }
@@ -91,8 +78,3 @@ setup = () => {
 }
 console.log("start");
 setup();
-
-// window.addEventListener('load',function(){
-//     document.getElementById("id1").addEventListener("click", click_handler1, false);
-//     document.getElementById("id2").addEventListener("click", click_handler2, false);
-// });
