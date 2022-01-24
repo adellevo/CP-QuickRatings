@@ -21,33 +21,49 @@ addEval = () => {
             newElement.setAttribute("style", `background-color: ${color}`);
 
             let profContainer = section.parentNode;
-            let popup = initPopup(profContainer);
+            profContainer.className = 'parContainer';
+            let popup = initPopup(profContainer, profArr[0]);
             profContainer.appendChild(popup); 
             profContainer.replaceChild(newElement, section);
         }
     }));
 }
 
-initPopup = (profContainer) => {
+initPopup = (profContainer, profName) => {
     // create popup
-    let popup = document.createElement("div");
-    popup.setAttribute("style", "background-color: lightblue");
-    popup.style.display = "none"; 
+    let popup = document.createElement('div');
+    popup.style.display = 'none';
+    popup.className = 'popup';
+
+    const modalTip = document.createElement('div');
+    modalTip.className = 'arrowUp';
+    popup.appendChild(modalTip);
+
+    const titleDiv = document.createElement('div');
+    const evalNum = 37; // placeholder
+    titleDiv.innerHTML = `<h1>${profName}</h1><p>Based on ${evalNum} ratings...</p>`;
+    popup.appendChild(titleDiv);
 
     // fill popup with subrating data
     const overview = [
-        "Clarity: 3.4",
-        "Helpfulness: 3.3",
+        "Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
+        "Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
+        "Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
     ];
-    overview.forEach((subrating) => {
-        popup.appendChild(document.createTextNode(subrating));
-        popup.appendChild(document.createElement("br"));
+    overview.forEach((subrating, i) => {
+        let subDiv = document.createElement('div');
+        subDiv.innerHTML = subrating;
+        popup.appendChild(subDiv);
+        (i % 2 == 0) 
+            ? subDiv.className = 'subrating-even' 
+            : subDiv.className = 'subrating-odd';
     });
 
     // PolyRatings link
-    const anchor = document.createElement('a');
-    anchor.innerHTML = '<a href="https://www.polyratings.com/list.html" target="_blank"> View on PolyRatings </a>';
-    popup.appendChild(anchor);
+    const btn = document.createElement('div');
+    btn.innerHTML = '<a href="https://www.polyratings.com/list.html" target="_blank"> View on PolyRatings </a>';
+    btn.className = 'btn';
+    popup.appendChild(btn);
     
     // add event listeners for popup
     handleMouseOver = () => popup.style.display = "block";
