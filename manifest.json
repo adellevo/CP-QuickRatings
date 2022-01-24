@@ -5,8 +5,9 @@
     {
         "matches": ["https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&*"],
         "all_frames": true,
-        "run_at": "document_end",
-        "js": ["main.js"]
+        "css": [ "main.css" ],
+        "js": ["main.js"],
+        "run_at": "document_end"
     }
     ],
     "host_permissions": [
