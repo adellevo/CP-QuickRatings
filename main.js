@@ -44,9 +44,11 @@ initPopup = (profContainer, profName) => {
     titleDiv.innerHTML = `<h1>${profName}</h1><p>Based on ${evalNum} ratings...</p>`;
     popup.appendChild(titleDiv);
 
+    // const ratings = getProfessorInfo(profName);
+
     // fill popup with subrating data
     const overview = [
-        "Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
+        "Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + ratings[0] + " / 4.0",
         "Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
         "Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
     ];
@@ -89,14 +91,14 @@ findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : n
 
 setup = () => {
     addEval(document);
-    getProfessorInfo("First Last");
+    getProfessorInfo("Phillip Nico");
     setTimeout(setup, 1000);
     // funcName("https://www.polyratings.com/list.html")
 }
 
 getProfessorInfo = (name) => {
     const id = getProfessorID(name);
-
+    let arr = [];
     chrome.runtime.sendMessage(
         {
             url: 'https://www.polyratings.com/eval/' + id + '/index.html',
@@ -110,24 +112,57 @@ getProfessorInfo = (name) => {
                 let ratings = temp.getElementsByClassName("row eval-header")[0].innerText;
                 console.log(ratings);
                 
-                const stars = ratings.substring(ratings.indexOf('evaluations')-12, ratings.indexOf('evaluations')-3);
+                const stars = ratings.substring(ratings.indexOf('evaluations')-12, ratings.indexOf('evaluations')-9);
+                arr.push(stars);
                 console.log('star rating: ' + stars);
-
+            
                 const rsd = ratings.substring(ratings.indexOf('Difficulties')+14, ratings.indexOf('Difficulties')+18);
+                arr.push(rsd);
                 console.log('Recognizes Student Difficulty: ' + rsd);
-
+            
                 const pmc = ratings.substring(ratings.indexOf('Clearly')+9, ratings.indexOf('Clearly')+13);
+                arr.push(pmc);
                 console.log('Presents Material Clearly: ' + pmc);
+
+                // arr = callback(ratings);
+                // console.log(arr);
             }
         }
     );
+    // console.log(arr)
+    // return arr;
 }
 
+// getRatings = (ratings) => {
+//     let arr = []
+//     const stars = ratings.substring(ratings.indexOf('evaluations')-12, ratings.indexOf('evaluations')-9);
+//     arr.push(stars);
+//     console.log('star rating: ' + stars);
+
+//     const rsd = ratings.substring(ratings.indexOf('Difficulties')+14, ratings.indexOf('Difficulties')+18);
+//     arr.push(rsd);
+//     console.log('Recognizes Student Difficulty: ' + rsd);
+
+//     const pmc = ratings.substring(ratings.indexOf('Clearly')+9, ratings.indexOf('Clearly')+13);
+//     arr.push(pmc);
+//     console.log('Presents Material Clearly: ' + pmc);
+
+//     return arr;
+// }
+
 // Query csv file to get professor id from name
-// Names in csv file have no space - either get ride of space here or figure out 
-// how to add spaces when creating
+// Names in csv file have no space so removing space from names here 
 getProfessorID = (name) => {
-    const id = 2073;
+    let data = [{"professor_name": "ChristinaAbel", "professor_id": 2073}, {"professor_name": "PhillipNico", "professor_id": 479}];
+    const space_removed = name.replace(/\s/g, '');
+    // console.log(space_removed);
+
+    const id = data.filter((d) => {
+        return d.professor_name === space_removed 
+    })[0].professor_id;
+
+
+    console.log(id);
     return id;
 }
 setup();
