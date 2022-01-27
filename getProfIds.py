@@ -13,6 +13,7 @@ parsed_html = BeautifulSoup(html, 'html.parser')
 header = ['professor_name', 'professor_id']
 csv_file = open('profIds.csv', 'w', newline='')
 csv_writer = csv.writer(csv_file)
+csv_writer.writerow(header);
 
 for link in parsed_html.find_all('a', attrs={'href': re.compile("^/eval/")}):
     professor_name = link.get('data-search').replace(' ', '')
