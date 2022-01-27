@@ -17,6 +17,12 @@
     "manifest_version": 3,
     "background": {
         "service_worker": "background.js"
-    }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["profIds.csv"],
+            "matches": ["<all_urls>"]
+        }
+    ]
 }
     

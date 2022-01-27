@@ -91,6 +91,7 @@ findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : n
 
 setup = () => {
     addEval(document);
+    parseCsvResponse();
     getProfessorInfo("Phillip Nico");
     setTimeout(setup, 1000);
     // funcName("https://www.polyratings.com/list.html")
@@ -133,22 +134,25 @@ getProfessorInfo = (name) => {
     // return arr;
 }
 
-// getRatings = (ratings) => {
-//     let arr = []
-//     const stars = ratings.substring(ratings.indexOf('evaluations')-12, ratings.indexOf('evaluations')-9);
-//     arr.push(stars);
-//     console.log('star rating: ' + stars);
+readCsvValues = () => {
+    const url = chrome.runtime.getURL('./profIds.csv');
+    return fetch(url)
+        .then((response) => {
+            return response.text().then(text => {
+                // console.log(text);
+                return text;
+        }).catch((err) => {
+            console.log(err);
+        })
+    });
+}
 
-//     const rsd = ratings.substring(ratings.indexOf('Difficulties')+14, ratings.indexOf('Difficulties')+18);
-//     arr.push(rsd);
-//     console.log('Recognizes Student Difficulty: ' + rsd);
-
-//     const pmc = ratings.substring(ratings.indexOf('Clearly')+9, ratings.indexOf('Clearly')+13);
-//     arr.push(pmc);
-//     console.log('Presents Material Clearly: ' + pmc);
-
-//     return arr;
-// }
+parseCsvResponse = async () => {
+    let responseData = await readCsvValues();
+    let profs = responseData.split('\n');
+    console.log(profs);
+    // console.log(responseData);
+} 
 
 // Query csv file to get professor id from name
 // Names in csv file have no space so removing space from names here 
@@ -160,7 +164,6 @@ getProfessorID = (name) => {
     const id = data.filter((d) => {
         return d.professor_name === space_removed 
     })[0].professor_id;
-
 
     console.log(id);
     return id;

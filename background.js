@@ -1,6 +1,3 @@
-// XMLHttpRequest only works with manifest v2, need to use fetch on v3
-// https://developer.chrome.com/docs/extensions/mv3/xhr/
-
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
     const init = {
         method: 'GET'
