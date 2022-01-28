@@ -44,11 +44,11 @@ initPopup = (profContainer, profName) => {
     titleDiv.innerHTML = `<h1>${profName}</h1><p>Based on ${evalNum} ratings...</p>`;
     popup.appendChild(titleDiv);
 
-    // const ratings = getProfessorInfo(profName);
+    getProfessorInfo(profName);
 
     // fill popup with subrating data
     const overview = [
-        "Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + ratings[0] + " / 4.0",
+        "Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
         "Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
         "Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
     ];
@@ -91,39 +91,38 @@ findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : n
 
 setup = () => {
     addEval(document);
-    parseCsvResponse();
-    getProfessorInfo("Phillip Nico");
+    // getProfessorInfo("Phillip Nico");
     setTimeout(setup, 1000);
     // funcName("https://www.polyratings.com/list.html")
 }
 
-getProfessorInfo = (name) => {
-    const id = getProfessorID(name);
-    let arr = [];
+getProfessorInfo = async (name) => {
+    const id = await getProfessorID(name);
+    const url = 'https://www.polyratings.com/eval/' + id + '/index.html'; // Added this to link in popup later
     chrome.runtime.sendMessage(
         {
-            url: 'https://www.polyratings.com/eval/' + id + '/index.html',
+            url: url
         },
         (response) => {
             if (response != "error") {
-                // console.log(response);
                 let temp = document.createElement('html');
                 temp.innerHTML = response;
                 
                 let ratings = temp.getElementsByClassName("row eval-header")[0].innerText;
                 console.log(ratings);
                 
+                // Need to fix these later - substring will not work correcly if they have things 100+ (3 digit) ratings
                 const stars = ratings.substring(ratings.indexOf('evaluations')-12, ratings.indexOf('evaluations')-9);
-                arr.push(stars);
                 console.log('star rating: ' + stars);
             
                 const rsd = ratings.substring(ratings.indexOf('Difficulties')+14, ratings.indexOf('Difficulties')+18);
-                arr.push(rsd);
                 console.log('Recognizes Student Difficulty: ' + rsd);
             
                 const pmc = ratings.substring(ratings.indexOf('Clearly')+9, ratings.indexOf('Clearly')+13);
-                arr.push(pmc);
                 console.log('Presents Material Clearly: ' + pmc);
+
+                const numRatings = ratings.substring(ratings.indexOf('evaluations')-3, ratings.indexOf('evaluations'));
+                console.log('number of ratings: ' + numRatings);
 
                 // arr = callback(ratings);
                 // console.log(arr);
@@ -131,9 +130,9 @@ getProfessorInfo = (name) => {
         }
     );
     // console.log(arr)
-    // return arr;
 }
 
+// Turns CSV file data into large block of text
 readCsvValues = () => {
     const url = chrome.runtime.getURL('./profIds.csv');
     return fetch(url)
@@ -147,24 +146,35 @@ readCsvValues = () => {
     });
 }
 
+// Turns CSV text into map with professor_name as key and professor_id as value
 parseCsvResponse = async () => {
     let responseData = await readCsvValues();
-    let profs = responseData.split('\n');
+    let lines = responseData.split('\n');
+    const profs = new Map();
+
+    lines.forEach((line, i) => {
+        if (i == 0 || i == lines.length - 1) // skip the header and last line which is empty
+            return;
+        current = line.split(',');
+        const prof_name = current[0];
+        const prof_id = current[1].replace('\r', '');
+        // console.log(current);
+        profs.set(prof_name, prof_id);
+    });
+
     console.log(profs);
+    return profs;
     // console.log(responseData);
 } 
 
-// Query csv file to get professor id from name
+// Use map to get professor_id from profess_name
 // Names in csv file have no space so removing space from names here 
-getProfessorID = (name) => {
-    let data = [{"professor_name": "ChristinaAbel", "professor_id": 2073}, {"professor_name": "PhillipNico", "professor_id": 479}];
+getProfessorID = async (name) => {
+    const data = await parseCsvResponse();
+    // console.log(data);
     const space_removed = name.replace(/\s/g, '');
     // console.log(space_removed);
-
-    const id = data.filter((d) => {
-        return d.professor_name === space_removed 
-    })[0].professor_id;
-
+    const id = data.get(space_removed);
     console.log(id);
     return id;
 }
