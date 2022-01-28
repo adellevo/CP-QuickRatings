@@ -39,16 +39,19 @@ initPopup = (profContainer, profName) => {
     // modalTip.className = 'arrowUp';
     // popup.appendChild(modalTip);
 
-    const titleDiv = document.createElement('div');
-    const evalNum = 37; // placeholder
-    titleDiv.innerHTML = `<h1>${profName}</h1><p>Based on ${evalNum} ratings...</p>`;
-    popup.appendChild(titleDiv);
-
+    // get data from PR, set values accordingly
     getProfessorInfo(profName);
-    const jsonProf = JSON.parse(window.localStorage.getItem(profName));
 
+    // 
+    const jsonProf = JSON.parse(window.localStorage.getItem(profName));
     if (jsonProf != null) {
-        // fill popup with subrating data
+
+        // popup header 
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `<h1>${jsonProf.name}</h1><p>Based on ${jsonProf.nr} ratings...</p>`;
+        popup.appendChild(titleDiv);
+
+        // create table rows 
         const overview = [
             `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.stars} / 4.00`,
             `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.pmc} / 4.00`,
