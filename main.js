@@ -3,82 +3,57 @@
 addEval = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
     sectionArr.forEach(((section) => {
-        // page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
-        // let rating = "3.5"; // placeholder
         let profArr = findProfs(section.innerText); 
         if (profArr != null) {
-            const jsonProf = JSON.parse(window.localStorage.getItem(profArr[0]));
-            if (jsonProf != null) {
-                let newElement = document.createElement("span");
-                // two profs
-                if (profArr.length == 2) {
-                    newElement.innerText = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
-                }
-                // only one prof
-                else {
-                    newElement.innerText = `${profArr[0]} (${jsonProf.stars})`;
-                }
-                color = setTierColor(parseFloat(jsonProf.stars));
-                newElement.setAttribute("style", `background-color: ${color}`);
-                // newElement.setAttribute('style', 'text-decoration: underline');
-                let profContainer = section.parentNode;
-                profContainer.className = 'parContainer';
-                let popup = initPopup(profContainer, profArr[0]);
-                profContainer.appendChild(popup); 
-                profContainer.replaceChild(newElement, section);
-            }
+            // let rating = 3.5;
+            // let newElement = document.createElement("span");
+            
+            let profContainer = section.parentNode;
+            profContainer.className = 'parContainer';
+
+            let newElement = document.createElement("span");
+            getProfessorInfo(profContainer, profArr, newElement, section);
         }
     }));
 }
 
-initPopup = (profContainer, profName) => {
+initPopup = (profContainer, prof) => {
     // create popup
     let popup = document.createElement('div');
     popup.style.display = 'none';
     popup.className = 'popup';
 
-    // const modalTip = document.createElement('div');
-    // modalTip.className = 'arrowUp';
-    // popup.appendChild(modalTip);
+    // popup header 
+    const titleDiv = document.createElement('div');
+    titleDiv.innerHTML = `<h1>${prof.name}</h1><p>Based on ${prof.nr} ratings...</p>`;
+    popup.appendChild(titleDiv);
 
-    // get data from PR, set values accordingly
-    getProfessorInfo(profName);
+    // create table rows 
+    const overview = [
+        `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prof.stars} / 4.00`,
+        `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prof.pmc} / 4.00`,
+        `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${prof.rsd} / 4.00`,
+    ];
+    overview.forEach((subrating, i) => {
+        let subDiv = document.createElement('div');
+        subDiv.innerHTML = subrating;
+        popup.appendChild(subDiv);
+        (i % 2 == 0) 
+            ? subDiv.className = 'subrating-even' 
+            : subDiv.className = 'subrating-odd';
+    });
 
-    const jsonProf = JSON.parse(window.localStorage.getItem(profName));
-    if (jsonProf != null) {
-
-        // popup header 
-        const titleDiv = document.createElement('div');
-        titleDiv.innerHTML = `<h1>${jsonProf.name}</h1><p>Based on ${jsonProf.nr} ratings...</p>`;
-        popup.appendChild(titleDiv);
-
-        // create table rows 
-        const overview = [
-            `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.stars} / 4.00`,
-            `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.pmc} / 4.00`,
-            `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.rsd} / 4.00`,
-        ];
-        overview.forEach((subrating, i) => {
-            let subDiv = document.createElement('div');
-            subDiv.innerHTML = subrating;
-            popup.appendChild(subDiv);
-            (i % 2 == 0) 
-                ? subDiv.className = 'subrating-even' 
-                : subDiv.className = 'subrating-odd';
-        });
-
-        // PolyRatings link
-        const btn = document.createElement('div');
-        btn.innerHTML = `<a href=${jsonProf.url} target="_blank"> View on PolyRatings </a>`;
-        btn.className = 'btn';
-        popup.appendChild(btn);
-        
-        // add event listeners for popup
-        handleMouseOver = () => popup.style.display = "block";
-        handleMouseOut = () => popup.style.display = "none";
-        profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
-        profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
-    }
+    // PolyRatings link
+    const btn = document.createElement('div');
+    btn.innerHTML = `<a href=${prof.url} target="_blank"> View on PolyRatings </a>`;
+    btn.className = 'btn';
+    popup.appendChild(btn);
+    
+    // add event listeners for popup
+    handleMouseOver = () => popup.style.display = "block";
+    handleMouseOut = () => popup.style.display = "none";
+    profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
+    profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
 
     return popup;
 }
@@ -103,8 +78,8 @@ setup = () => {
     // funcName("https://www.polyratings.com/list.html")
 }
 
-getProfessorInfo = async (name) => {
-    const id = await getProfessorID(name);
+getProfessorInfo = async (profContainer, profArr, newElement, section) => {
+    const id = await getProfessorID(profArr[0]);
     const url = 'https://www.polyratings.com/eval/' + id + '/index.html'; // Added this to link in popup later
     chrome.runtime.sendMessage(
         {
@@ -128,15 +103,32 @@ getProfessorInfo = async (name) => {
                 // console.log('Presents Material Clearly: ' + pmc);
                 
                 const prof = {
-                    "name": name,
+                    "name": profArr[0],
                     "stars": stars, // # of ratings
                     "rsd": rsd, // recognizes student difficulty
                     "pmc": pmc, // presents material clearly
                     "nr": numRatings, // # of evals
                     "url": url // PolyRatings url
                 }
-                // Convert JSON object to string to store it
-                window.localStorage.setItem(name, JSON.stringify(prof));
+
+                let popup = initPopup(profContainer, prof);
+                profContainer.appendChild(popup); 
+
+                // two profs
+                if (profArr.length == 2) {
+                    newElement.innerText = `${profArr[0]} (${prof.stars}), ${profArr[1]} (${prof.stars})`;
+                }
+                // only one prof
+                else {
+                    newElement.innerText = `${prof.name} (${prof.stars})`;
+                }
+                color = setTierColor(parseFloat(prof.stars));
+                newElement.setAttribute("style", `background-color: ${color}`);
+                profContainer.replaceChild(newElement, section);
+                // newElement.setAttribute('style', 'text-decoration: underline');
+
+                // // Convert JSON object to string to store it
+                // window.localStorage.setItem(name, JSON.stringify(prof));
 
                 // arr = callback(ratings);
                 // console.log(arr);
