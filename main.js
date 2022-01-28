@@ -35,9 +35,9 @@ initPopup = (profContainer, profName) => {
     popup.style.display = 'none';
     popup.className = 'popup';
 
-    const modalTip = document.createElement('div');
-    modalTip.className = 'arrowUp';
-    popup.appendChild(modalTip);
+    // const modalTip = document.createElement('div');
+    // modalTip.className = 'arrowUp';
+    // popup.appendChild(modalTip);
 
     const titleDiv = document.createElement('div');
     const evalNum = 37; // placeholder
@@ -45,33 +45,36 @@ initPopup = (profContainer, profName) => {
     popup.appendChild(titleDiv);
 
     getProfessorInfo(profName);
+    const jsonProf = JSON.parse(window.localStorage.getItem(profName));
 
-    // fill popup with subrating data
-    const overview = [
-        "Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
-        "Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
-        "Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;3.4 / 4.0",
-    ];
-    overview.forEach((subrating, i) => {
-        let subDiv = document.createElement('div');
-        subDiv.innerHTML = subrating;
-        popup.appendChild(subDiv);
-        (i % 2 == 0) 
-            ? subDiv.className = 'subrating-even' 
-            : subDiv.className = 'subrating-odd';
-    });
+    if (jsonProf != null) {
+        // fill popup with subrating data
+        const overview = [
+            `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.stars} / 4.00`,
+            `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.pmc} / 4.00`,
+            `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${jsonProf.rsd} / 4.00`,
+        ];
+        overview.forEach((subrating, i) => {
+            let subDiv = document.createElement('div');
+            subDiv.innerHTML = subrating;
+            popup.appendChild(subDiv);
+            (i % 2 == 0) 
+                ? subDiv.className = 'subrating-even' 
+                : subDiv.className = 'subrating-odd';
+        });
 
-    // PolyRatings link
-    const btn = document.createElement('div');
-    btn.innerHTML = '<a href="https://www.polyratings.com/list.html" target="_blank"> View on PolyRatings </a>';
-    btn.className = 'btn';
-    popup.appendChild(btn);
-    
-    // add event listeners for popup
-    handleMouseOver = () => popup.style.display = "block";
-    handleMouseOut = () => popup.style.display = "none";
-    profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
-    profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
+        // PolyRatings link
+        const btn = document.createElement('div');
+        btn.innerHTML = `<a href=${jsonProf.url} target="_blank"> View on PolyRatings </a>`;
+        btn.className = 'btn';
+        popup.appendChild(btn);
+        
+        // add event listeners for popup
+        handleMouseOver = () => popup.style.display = "block";
+        handleMouseOut = () => popup.style.display = "none";
+        profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
+        profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
+    }
 
     return popup;
 }
@@ -108,21 +111,28 @@ getProfessorInfo = async (name) => {
                 let temp = document.createElement('html');
                 temp.innerHTML = response;
                 
-                let ratings = temp.getElementsByClassName("row eval-header")[0].innerText;
-                console.log(ratings);
-                
-                // Need to fix these later - substring will not work correcly if they have things 100+ (3 digit) ratings
-                const stars = ratings.substring(ratings.indexOf('evaluations')-12, ratings.indexOf('evaluations')-9);
-                console.log('star rating: ' + stars);
-            
-                const rsd = ratings.substring(ratings.indexOf('Difficulties')+14, ratings.indexOf('Difficulties')+18);
-                console.log('Recognizes Student Difficulty: ' + rsd);
-            
-                const pmc = ratings.substring(ratings.indexOf('Clearly')+9, ratings.indexOf('Clearly')+13);
-                console.log('Presents Material Clearly: ' + pmc);
+                const stars = temp.getElementsByClassName("text-primary")[1].innerText.split("/")[0];
+                // console.log('star rating: ' + stars);
 
-                const numRatings = ratings.substring(ratings.indexOf('evaluations')-3, ratings.indexOf('evaluations'));
-                console.log('number of ratings: ' + numRatings);
+                const numRatings = temp.querySelectorAll('b')[0].innerText.split(" ")[0];
+                // console.log('number of ratings: ' + numRatings);
+            
+                const rsd = temp.querySelectorAll('b')[1].innerText.split(": ")[1];
+                // console.log('Recognizes Student Difficulty: ' + rsd);
+
+                const pmc = temp.querySelectorAll('b')[2].innerText.split(": ")[1];
+                // console.log('Presents Material Clearly: ' + pmc);
+                
+                const prof = {
+                    "name": name,
+                    "stars": stars, // # of ratings
+                    "rsd": rsd, // recognizes student difficulty
+                    "pmc": pmc, // presents material clearly
+                    "nr": numRatings, // # of evals
+                    "url": url // PolyRatings url
+                }
+                // Convert JSON object to string to store it
+                window.localStorage.setItem(name, JSON.stringify(prof));
 
                 // arr = callback(ratings);
                 // console.log(arr);
