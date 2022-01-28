@@ -4,27 +4,29 @@ addEval = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
     sectionArr.forEach(((section) => {
         // page.querySelector(`[data-search=${CSS.escape(name)}`).getAttribute('href');
-        let rating = "3.5"; // placeholder
+        // let rating = "3.5"; // placeholder
         let profArr = findProfs(section.innerText); 
-        
         if (profArr != null) {
-            let newElement = document.createElement("span");
-            // two profs
-            if (profArr.length == 2) {
-                newElement.innerText = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
+            const jsonProf = JSON.parse(window.localStorage.getItem(profArr[0]));
+            if (jsonProf != null) {
+                let newElement = document.createElement("span");
+                // two profs
+                if (profArr.length == 2) {
+                    newElement.innerText = `${profArr[0]} (${rating}), ${profArr[1]} (${rating})`;
+                }
+                // only one prof
+                else {
+                    newElement.innerText = `${profArr[0]} (${jsonProf.stars})`;
+                }
+                color = setTierColor(parseFloat(jsonProf.stars));
+                newElement.setAttribute("style", `background-color: ${color}`);
+                // newElement.setAttribute('style', 'text-decoration: underline');
+                let profContainer = section.parentNode;
+                profContainer.className = 'parContainer';
+                let popup = initPopup(profContainer, profArr[0]);
+                profContainer.appendChild(popup); 
+                profContainer.replaceChild(newElement, section);
             }
-            // only one prof
-            else {
-                newElement.innerText = `${profArr[0]} (${rating})`;
-            }
-            color = setTierColor(parseFloat(rating));
-            newElement.setAttribute("style", `background-color: ${color}`);
-
-            let profContainer = section.parentNode;
-            profContainer.className = 'parContainer';
-            let popup = initPopup(profContainer, profArr[0]);
-            profContainer.appendChild(popup); 
-            profContainer.replaceChild(newElement, section);
         }
     }));
 }
@@ -42,7 +44,6 @@ initPopup = (profContainer, profName) => {
     // get data from PR, set values accordingly
     getProfessorInfo(profName);
 
-    // 
     const jsonProf = JSON.parse(window.localStorage.getItem(profName));
     if (jsonProf != null) {
 
@@ -87,8 +88,8 @@ setTierColor = (rating) => {
     let upper = "#D4E9B8"; // green
     let mid = "#F4D48B"; // yellow-orange
     let bottom = "#F8B0B0"; // red
-    return rating >= 3.5 ? upper
-        : rating >= 2.5 ? mid
+    return rating >= 3 ? upper
+        : rating >= 2 ? mid
         : bottom;
 }
 
