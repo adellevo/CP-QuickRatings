@@ -1,3 +1,4 @@
+let profs = new Map();
 // sectionArr = array of sections
 // profArr = array of profs for that section
 addEval = () => {
@@ -71,16 +72,19 @@ setTierColor = (rating) => {
 // returns array of professors
 findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : name.split(','));
 
-setup = () => {
+setup = async ()  => {
+    // only creates global map of prorfessor names/ids once
+    if (profs.size === 0) {
+        console.log('getting professor ids');
+        await parseCsvResponse();
+    }
     addEval(document);
-    // getProfessorInfo("Phillip Nico");
     setTimeout(setup, 1000);
-    // funcName("https://www.polyratings.com/list.html")
 }
 
 getProfessorInfo = async (profContainer, profArr, newElement, section) => {
     const id = await getProfessorID(profArr[0]);
-    const url = 'https://www.polyratings.com/eval/' + id + '/index.html'; // Added this to link in popup later
+    const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
     chrome.runtime.sendMessage(
         {
             url: url
@@ -131,11 +135,9 @@ getProfessorInfo = async (profContainer, profArr, newElement, section) => {
                 // window.localStorage.setItem(name, JSON.stringify(prof));
 
                 // arr = callback(ratings);
-                // console.log(arr);
             }
         }
     );
-    // console.log(arr)
 }
 
 // Turns CSV file data into large block of text
@@ -156,32 +158,28 @@ readCsvValues = () => {
 parseCsvResponse = async () => {
     let responseData = await readCsvValues();
     let lines = responseData.split('\n');
-    const profs = new Map();
 
+    // skip the header and last line which is empty
     lines.forEach((line, i) => {
-        if (i == 0 || i == lines.length - 1) // skip the header and last line which is empty
+        if (i == 0 || i == lines.length - 1) 
             return;
         current = line.split(',');
         const prof_name = current[0];
         const prof_id = current[1].replace('\r', '');
-        // console.log(current);
         profs.set(prof_name, prof_id);
     });
 
     console.log(profs);
-    return profs;
-    // console.log(responseData);
+    // return profs;
 } 
 
-// Use map to get professor_id from profess_name
+// Use global map to get professor_id from professor_name
 // Names in csv file have no space so removing space from names here 
 getProfessorID = async (name) => {
-    const data = await parseCsvResponse();
-    // console.log(data);
     const space_removed = name.replace(/\s/g, '');
     // console.log(space_removed);
-    const id = data.get(space_removed);
-    console.log(id);
+    const id = profs.get(space_removed);
+    // console.log(id);
     return id;
 }
 setup();
