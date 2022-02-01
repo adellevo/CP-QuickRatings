@@ -1,20 +1,18 @@
-/* .arrowUp {
-  width: 0;
-  height: 0;
-  margin: 30px 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 5px solid rgb(87, 87, 87);
-} */
-
 :root {
   --green: #5b6448;
   --gray: #494a45;
 }
 
 .parContainer {
-  overflow: hidden;
+  overflow: visible;
+  border: 1px solid rgb(11, 52, 105) 48;
+  align-items: center;
 }
+
+/* .profSpan {
+  display: table;
+  margin: 0 auto;
+} */
 
 h1 {
   margin-top: 5px;

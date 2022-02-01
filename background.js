@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
         .then(response => {
             if (response.status != 200) {
                 console.log('error, status code ' + response.status);
-                return;
+                return 'error';
             }
             return response.text();
         })

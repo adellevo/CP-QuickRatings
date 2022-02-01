@@ -6,14 +6,14 @@ addEval = () => {
     sectionArr.forEach(((section) => {
         let profArr = findProfs(section.innerText); 
         if (profArr != null) {
-            // let rating = 3.5;
-            // let newElement = document.createElement("span");
-            
             let profContainer = section.parentNode;
             profContainer.className = 'parContainer';
-
-            let newElement = document.createElement("span");
-            getProfessorInfo(profContainer, profArr, newElement, section);
+            let tempDiv = document.createElement('div'); // for multiple profs
+            // might have multiple profs per class
+            for (let i = 0; i < profArr.length; i++) {
+                let newElement = document.createElement('span');
+                getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section);
+            }
         }
     }));
 }
@@ -46,31 +46,21 @@ initPopup = (profContainer, prof) => {
 
     // PolyRatings link
     const btn = document.createElement('div');
-    btn.innerHTML = `<a href=${prof.url} target="_blank"> View on PolyRatings </a>`;
+    btn.innerHTML = `<a href=${prof.url} target='_blank'> View on PolyRatings </a>`;
     btn.className = 'btn';
     popup.appendChild(btn);
     
     // add event listeners for popup
-    handleMouseOver = () => popup.style.display = "block";
-    handleMouseOut = () => popup.style.display = "none";
+    handleMouseOver = () => popup.style.display = 'block';
+    handleMouseOut = () => popup.style.display = 'none';
     profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
     profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
 
     return popup;
 }
 
-// sets color based on rating tier
-setTierColor = (rating) => {
-    let upper = "#D4E9B8"; // green
-    let mid = "#F4D48B"; // yellow-orange
-    let bottom = "#F8B0B0"; // red
-    return rating >= 3 ? upper
-        : rating >= 2 ? mid
-        : bottom;
-}
-
 // returns array of professors
-findProfs = (name) => ((name == "To be Announced" || name == "Staff") ? null : name.split(','));
+findProfs = (name) => ((name == 'To be Announced' || name == 'Staff') ? null : name.split(','));
 
 setup = async ()  => {
     // only creates global map of prorfessor names/ids once
@@ -82,59 +72,72 @@ setup = async ()  => {
     setTimeout(setup, 1000);
 }
 
-getProfessorInfo = async (profContainer, profArr, newElement, section) => {
-    const id = await getProfessorID(profArr[0]);
+getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
+    const id = await getProfessorID(profArr[i]);
+    // if (id == '2001') {
+    //     console.log("id: " + id);
+    // }
     const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
     chrome.runtime.sendMessage(
         {
             url: url
         },
         (response) => {
-            if (response != "error") {
+            if (response != 'error') {
                 let temp = document.createElement('html');
                 temp.innerHTML = response;
                 
-                const stars = temp.getElementsByClassName("text-primary")[1].innerText.split("/")[0];
+                const stars = temp.getElementsByClassName('text-primary')[1].innerText.split('/')[0];
                 // console.log('star rating: ' + stars);
 
-                const numRatings = temp.querySelectorAll('b')[0].innerText.split(" ")[0];
+                const numRatings = temp.querySelectorAll('b')[0].innerText.split(' ')[0];
                 // console.log('number of ratings: ' + numRatings);
             
-                const rsd = temp.querySelectorAll('b')[1].innerText.split(": ")[1];
+                const rsd = temp.querySelectorAll('b')[1].innerText.split(': ')[1];
                 // console.log('Recognizes Student Difficulty: ' + rsd);
 
-                const pmc = temp.querySelectorAll('b')[2].innerText.split(": ")[1];
+                const pmc = temp.querySelectorAll('b')[2].innerText.split(': ')[1];
                 // console.log('Presents Material Clearly: ' + pmc);
                 
                 const prof = {
-                    "name": profArr[0],
-                    "stars": stars, // # of ratings
-                    "rsd": rsd, // recognizes student difficulty
-                    "pmc": pmc, // presents material clearly
-                    "nr": numRatings, // # of evals
-                    "url": url // PolyRatings url
+                    'name': profArr[i], // prof name
+                    'stars': stars, // # of ratings
+                    'rsd': rsd, // recognizes student difficulty
+                    'pmc': pmc, // presents material clearly
+                    'nr': numRatings, // # of evals
+                    'url': url // PolyRatings url
                 }
 
                 let popup = initPopup(profContainer, prof);
                 profContainer.appendChild(popup); 
 
-                // two profs
-                if (profArr.length == 2) {
-                    newElement.innerText = `${profArr[0]} (${prof.stars}), ${profArr[1]} (${prof.stars})`;
-                }
+                color = '#D4E9B8';
+                newElement.setAttribute('style', `background-color: ${color}`);
+                newElement.innerText = `${prof.name}`;
+                
                 // only one prof
-                else {
-                    newElement.innerText = `${prof.name} (${prof.stars})`;
+                if (profArr.length == 1) {
+                    profContainer.replaceChild(newElement, section);
                 }
-                color = setTierColor(parseFloat(prof.stars));
-                newElement.setAttribute("style", `background-color: ${color}`);
-                profContainer.replaceChild(newElement, section);
-                // newElement.setAttribute('style', 'text-decoration: underline');
-
-                // // Convert JSON object to string to store it
-                // window.localStorage.setItem(name, JSON.stringify(prof));
-
-                // arr = callback(ratings);
+                // multiple profs
+                else {
+                    // console.log(prof.name);
+                    tempDiv.appendChild(newElement);
+                    if (i != profArr.length-1) {
+                        newElement.innerText += ', ';
+                    }
+                    // last professor reached, replace section with div 
+                    else {
+                        profContainer.replaceChild(tempDiv, section);
+                    }
+                }
+            }
+            else {
+                // handle case where one of the profs isn't on PolyRatings page
+                if (profArr.length > 1) {
+                    newElement.innerText = `${profArr[i]}`;
+                    tempDiv.appendChild(newElement)
+                }
             }
         }
     );
