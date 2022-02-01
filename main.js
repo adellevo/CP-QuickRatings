@@ -8,8 +8,9 @@ addEval = () => {
         if (profArr != null) {
             let profContainer = section.parentNode;
             profContainer.className = 'parContainer';
-            let tempDiv = document.createElement('div'); // for multiple profs
-            // might have multiple profs per class
+            
+            // account for multiple profs
+            let tempDiv = document.createElement('div'); 
             for (let i = 0; i < profArr.length; i++) {
                 let newElement = document.createElement('span');
                 getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section);
@@ -74,9 +75,6 @@ setup = async ()  => {
 
 getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
     const id = await getProfessorID(profArr[i]);
-    // if (id == '2001') {
-    //     console.log("id: " + id);
-    // }
     const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
     chrome.runtime.sendMessage(
         {
@@ -108,10 +106,10 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
                     'url': url // PolyRatings url
                 }
 
-                let popup = initPopup(profContainer, prof);
+                const popup = initPopup(profContainer, prof);
                 profContainer.appendChild(popup); 
-
-                color = '#D4E9B8';
+                
+                const color = '#D4E9B8';
                 newElement.setAttribute('style', `background-color: ${color}`);
                 newElement.innerText = `${prof.name}`;
                 
@@ -141,6 +139,8 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
             }
         }
     );
+    // return true;
+    return Promise.resolve("Dummy response to keep the console quiet");
 }
 
 // Turns CSV file data into large block of text
