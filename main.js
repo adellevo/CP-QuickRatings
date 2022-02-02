@@ -121,8 +121,8 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
                 else {
                     // console.log(prof.name);
                     tempDiv.appendChild(newElement);
-                    if (i != profArr.length-1) {
-                        newElement.innerText += ', ';
+                    if (i != 0) {
+                        newElement.innerText = `, ${prof.name}`;
                     }
                     // last professor reached, replace section with div 
                     else {
@@ -133,7 +133,10 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
             else {
                 // handle case where one of the profs isn't on PolyRatings page
                 if (profArr.length > 1) {
-                    newElement.innerText = `${profArr[i]}`;
+                    newElement.innerText = `, ${profArr[i]}`;
+                    // if (i != profArr.length-1) {
+                    //     newElement.innerText += ', ';
+                    // }
                     tempDiv.appendChild(newElement)
                 }
             }
