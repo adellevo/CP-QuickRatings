@@ -121,22 +121,24 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
                 else {
                     // console.log(prof.name);
                     tempDiv.appendChild(newElement);
-                    if (i != 0) {
-                        newElement.innerText = `, ${prof.name}`;
+                    if (i != profArr.length-1) {
+                        newElement.innerText += ', ';
                     }
-                    // last professor reached, replace section with div 
-                    else {
-                        profContainer.replaceChild(tempDiv, section);
-                    }
+                    profContainer.replaceChild(tempDiv, section);
+                    // fix comma issue
+                    firstHTML = profContainer.getElementsByTagName('span')[0].innerHTML;
+                    console.log("before: " + firstHTML);
+                    firstHTML = firstHTML.substring(firstHTML.indexOf('<br>') + 4);
+                    console.log("after: " + firstHTML);
                 }
             }
             else {
                 // handle case where one of the profs isn't on PolyRatings page
                 if (profArr.length > 1) {
-                    newElement.innerText = `, ${profArr[i]}`;
-                    // if (i != profArr.length-1) {
-                    //     newElement.innerText += ', ';
-                    // }
+                    newElement.innerText = `${profArr[i]}`;
+                    if (i != profArr.length-1) {
+                        newElement.innerText += ', ';
+                    }
                     tempDiv.appendChild(newElement)
                 }
             }
