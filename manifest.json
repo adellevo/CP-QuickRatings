@@ -9,7 +9,7 @@
     "description": "Chrome extension for PolyRatings",
     "content_scripts": [
     {
-        "matches": ["https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&*"],
+        "matches": ["https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?*", "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?*"],
         "all_frames": true,
         "css": [ "main.css" ],
         "js": ["main.js"],
