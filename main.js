@@ -11,10 +11,10 @@ addEval = () => {
             
             // account for multiple profs
             let tempDiv = document.createElement('div'); 
-            let nCount = 0; // number of nonexistent profs
+            // let nCount = 0; // number of nonexistent profs
             for (let i = 0; i < profArr.length; i++) {
                 let newElement = document.createElement('span');
-                getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section, nCount);
+                getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section);
             }
         }
     }));
@@ -67,14 +67,14 @@ findProfs = (name) => ((name == 'To be Announced' || name == 'Staff') ? null : n
 setup = async ()  => {
     // only creates global map of prorfessor names/ids once
     if (profs.size === 0) {
-        console.log('getting professor ids');
+        // console.log('getting professor ids');
         await parseCsvResponse();
     }
     addEval(document);
     setTimeout(setup, 1000);
 }
 
-getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section, nCount) => {
+getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
     const id = await getProfessorID(profArr[i]);
     const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
     chrome.runtime.sendMessage(
@@ -167,7 +167,7 @@ parseCsvResponse = async () => {
         profs.set(prof_name, prof_id);
     });
 
-    console.log(profs);
+    // console.log(profs);
     // return profs;
 } 
 
