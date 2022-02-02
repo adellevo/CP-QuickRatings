@@ -11,9 +11,10 @@ addEval = () => {
             
             // account for multiple profs
             let tempDiv = document.createElement('div'); 
+            let nCount = 0; // number of nonexistent profs
             for (let i = 0; i < profArr.length; i++) {
                 let newElement = document.createElement('span');
-                getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section);
+                getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section, nCount);
             }
         }
     }));
@@ -73,7 +74,7 @@ setup = async ()  => {
     setTimeout(setup, 1000);
 }
 
-getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
+getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section, nCount) => {
     const id = await getProfessorID(profArr[i]);
     const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
     chrome.runtime.sendMessage(
@@ -81,7 +82,10 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
             url: url
         },
         (response) => {
-            if (response != 'error') {
+            if (response == undefined || Object.keys(response).length == 0) {
+                return;
+            }
+            else if (response != 'error') {
                 let temp = document.createElement('html');
                 temp.innerHTML = response;
                 
@@ -111,7 +115,7 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
                 
                 const color = '#D4E9B8';
                 newElement.setAttribute('style', `background-color: ${color}`);
-                newElement.innerText = `${prof.name}`;
+                newElement.innerHTML = `${prof.name}<br>`;
                 
                 // only one prof
                 if (profArr.length == 1) {
@@ -119,33 +123,19 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
                 }
                 // multiple profs
                 else {
-                    // console.log(prof.name);
                     tempDiv.appendChild(newElement);
-                    if (i != profArr.length-1) {
-                        newElement.innerText += ', ';
-                    }
                     profContainer.replaceChild(tempDiv, section);
-                    // fix comma issue
-                    firstHTML = profContainer.getElementsByTagName('span')[0].innerHTML;
-                    console.log("before: " + firstHTML);
-                    firstHTML = firstHTML.substring(firstHTML.indexOf('<br>') + 4);
-                    console.log("after: " + firstHTML);
                 }
             }
             else {
-                // handle case where one of the profs isn't on PolyRatings page
-                if (profArr.length > 1) {
-                    newElement.innerText = `${profArr[i]}`;
-                    if (i != profArr.length-1) {
-                        newElement.innerText += ', ';
-                    }
-                    tempDiv.appendChild(newElement)
-                }
+                newElement.innerHTML = `${profArr[i]}<br>`;
+                tempDiv.appendChild(newElement);
+                profContainer.replaceChild(tempDiv, section);
             }
         }
     );
     // return true;
-    return Promise.resolve("Dummy response to keep the console quiet");
+    // return Promise.resolve("Dummy response to keep the console quiet");
 }
 
 // Turns CSV file data into large block of text

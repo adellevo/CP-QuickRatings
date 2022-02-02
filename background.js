@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
         .catch((err) => {
             console.log('Fetch error: ' + err);
         });
-        return true;
+    return true;
 
     // return Promise.resolve("Dummy response to keep the console quiet");
 });
