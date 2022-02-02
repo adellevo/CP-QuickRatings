@@ -1,6 +1,12 @@
 {
-    "name": "polyratings",
+    "name": "PolyRatings",
     "version": "1",
+    "icons": { 
+        "16": "icon16.png",
+        "48": "icon48.png",
+       "128": "icon128.png" 
+    },
+    "description": "Chrome extension for PolyRatings",
     "content_scripts": [
     {
         "matches": ["https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&*"],
