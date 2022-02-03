@@ -1,23 +1,29 @@
 {
     "name": "PolyRatings",
     "version": "1",
-    "icons": { 
+    "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
-       "128": "icon128.png" 
+        "128": "icon128.png"
     },
     "description": "Chrome extension for PolyRatings",
     "content_scripts": [
-    {
-        "matches": ["https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?*", "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?*"],
-        "all_frames": true,
-        "css": [ "main.css" ],
-        "js": ["main.js"],
-        "run_at": "document_end"
-    }
+        {
+            "matches": [
+                "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?*",
+                "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?*"
+            ],
+            "all_frames": true,
+            "css": [
+                "main.css"
+            ],
+            "js": [
+                "main.js"
+            ],
+            "run_at": "document_end"
+        }
     ],
     "host_permissions": [
-        "https://cmsweb.pscs.calpoly.edu/*",
         "https://www.polyratings.com/*"
     ],
     "manifest_version": 3,
@@ -26,9 +32,12 @@
     },
     "web_accessible_resources": [
         {
-            "resources": ["profIds.csv"],
-            "matches": ["<all_urls>"]
+            "resources": [
+                "profIds.csv"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
         }
     ]
 }
-    
