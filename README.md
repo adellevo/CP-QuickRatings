@@ -1,5 +1,5 @@
 # PolyRatings Chrome Extension
-*Disclaimer: We are not affiliated with the official PolyRatings site.*
+<mark>*We are not affiliated with the official PolyRatings site.*</mark>
 
 [Get the extension here](https://chrome.google.com/webstore/detail/polyratings/pliinobghndmnnjenolmokefjacnmdpo?hl=en&authuser=1)
 
