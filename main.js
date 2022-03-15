@@ -67,47 +67,31 @@ findProfs = (name) => ((name == 'To be Announced' || name == 'Staff') ? null : n
 setup = async ()  => {
     // only creates global map of prorfessor names/ids once
     if (profs.size === 0) {
-        // console.log('getting professor ids');
-        await parseCsvResponse();
+        console.log('getting professors');
+        await getProfessorRatings();
     }
     addEval(document);
     setTimeout(setup, 1000);
 }
 
 getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
-    const id = await getProfessorID(profArr[i]);
-    const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
+    console.log(profArr[i]);
     chrome.runtime.sendMessage(
         {
-            url: url
+            name: profArr[i]
         },
         (response) => {
             if (response == undefined || Object.keys(response).length == 0) {
                 return;
             }
             else if (response != 'error') {
-                let temp = document.createElement('html');
-                temp.innerHTML = response;
-                
-                const stars = temp.getElementsByClassName('text-primary')[1].innerText.split('/')[0];
-                // console.log('star rating: ' + stars);
-
-                const numRatings = temp.querySelectorAll('b')[0].innerText.split(' ')[0];
-                // console.log('number of ratings: ' + numRatings);
-            
-                const rsd = temp.querySelectorAll('b')[1].innerText.split(': ')[1];
-                // console.log('Recognizes Student Difficulty: ' + rsd);
-
-                const pmc = temp.querySelectorAll('b')[2].innerText.split(': ')[1];
-                // console.log('Presents Material Clearly: ' + pmc);
-                
                 const prof = {
                     'name': profArr[i], // prof name
-                    'stars': stars, // # of ratings
-                    'rsd': rsd, // recognizes student difficulty
-                    'pmc': pmc, // presents material clearly
-                    'nr': numRatings, // # of evals
-                    'url': url // PolyRatings url
+                    'stars': response.overallRating, // # of ratings
+                    'rsd': response.studentDifficulties, // recognizes student difficulty
+                    'pmc': response.materialClear, // presents material clearly
+                    'nr': response.numEvals, // # of evals
+                    'url': 'https://polyratings.dev/teacher/' + response.id // PolyRatings url
                 }
 
                 const popup = initPopup(profContainer, prof);
@@ -138,34 +122,41 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
     // return Promise.resolve("Dummy response to keep the console quiet");
 }
 
-// Turns CSV file data into large block of text
-readCsvValues = () => {
-    const url = chrome.runtime.getURL('./profIds.csv');
-    return fetch(url)
-        .then((response) => {
-            return response.text().then(text => {
-                // console.log(text);
-                return text;
-        }).catch((err) => {
-            console.log(err);
+getProfessorRatings = async () => {
+    const init = {
+        method: 'GET',
+        headers: {
+            'accept': 'application/vnd.github.v3.raw',
+        }
+    };
+    fetch("https://api.github.com/repos/Polyratings/polyratings-data/contents/professor-list.json?ref=data", init)
+        .then(response => {
+            if (response.status != 200) {
+                console.log('error, status code ' + response.status);
+                return 'error';
+            }
+            return response.json();
         })
-    });
-}
-
-// Turns CSV text into map with professor_name as key and professor_id as value
-parseCsvResponse = async () => {
-    let responseData = await readCsvValues();
-    let lines = responseData.split('\n');
+        .then((response) => {
+            response.forEach((professor) => {
+                console.log(professor);
+                const prof_name = professor.firstName + ' ' + professor.lastName;
+                
+            })
+        })
+        .catch((err) => {
+            console.log('Fetch error: ' + err);
+        });
 
     // skip the header and last line which is empty
-    lines.forEach((line, i) => {
-        if (i == 0 || i == lines.length - 1) 
-            return;
-        current = line.split(',');
-        const prof_name = current[0];
-        const prof_id = current[1].replace('\r', '');
-        profs.set(prof_name, prof_id);
-    });
+    // lines.forEach((line, i) => {
+    //     if (i == 0 || i == lines.length - 1) 
+    //         return;
+    //     current = line.split(',');
+    //     const prof_name = current[0];
+    //     const prof_id = current[1].replace('\r', '');
+    //     profs.set(prof_name, prof_id);
+    // });
 
     // console.log(profs);
     // return profs;
