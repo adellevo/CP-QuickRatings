@@ -3,68 +3,81 @@ let profs = new Map();
 // profArr = array of profs for that section
 addEval = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
-    sectionArr.forEach(((section) => {
-        let profArr = findProfs(section.innerText); 
+    sectionArr.forEach((section) => {
+        let profArr = findProfs(section.innerText);
         if (profArr != null) {
             let profContainer = section.parentNode;
-            profContainer.className = 'parContainer';
-            
+            profContainer.className = "parContainer";
+
             // account for multiple profs
-            let tempDiv = document.createElement('div'); 
+            let tempDiv = document.createElement("div");
             // let nCount = 0; // number of nonexistent profs
             for (let i = 0; i < profArr.length; i++) {
-                let newElement = document.createElement('span');
+                let newElement = document.createElement("span");
                 getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section);
             }
         }
-    }));
-}
+    });
+};
 
 initPopup = (profContainer, prof) => {
     // create popup
-    let popup = document.createElement('div');
-    popup.style.display = 'none';
-    popup.className = 'popup';
+    let popup = document.createElement("div");
+    popup.style.display = "none";
+    popup.className = "popup";
 
+<<<<<<< Updated upstream
     // popup header 
     const titleDiv = document.createElement('div');
     titleDiv.innerHTML = `<h1>${prof.name}</h1><p>Based on ${prof.nr} ratings...</p>`;
+=======
+    // popup header
+    const titleDiv = document.createElement("div");
+    titleDiv.innerHTML = `<h1>${prof.firstName} ${prof.lastName}</h1><p>Based on ${prof.numEvals} ratings...</p>`;
+>>>>>>> Stashed changes
     popup.appendChild(titleDiv);
 
-    // create table rows 
+    // create table rows
     const overview = [
         `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prof.stars} / 4.00`,
         `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prof.pmc} / 4.00`,
         `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${prof.rsd} / 4.00`,
     ];
     overview.forEach((subrating, i) => {
-        let subDiv = document.createElement('div');
+        let subDiv = document.createElement("div");
         subDiv.innerHTML = subrating;
         popup.appendChild(subDiv);
-        (i % 2 == 0) 
-            ? subDiv.className = 'subrating-even' 
-            : subDiv.className = 'subrating-odd';
+        i % 2 == 0
+            ? (subDiv.className = "subrating-even")
+            : (subDiv.className = "subrating-odd");
     });
 
     // PolyRatings link
+<<<<<<< Updated upstream
     const btn = document.createElement('div');
     btn.innerHTML = `<a href=${prof.url} target='_blank'> View on PolyRatings </a>`;
     btn.className = 'btn';
+=======
+    const btn = document.createElement("div");
+    btn.innerHTML = `<a href='https://polyratings.dev/teacher/${prof.id}' target='_blank'> View on PolyRatings </a>`;
+    btn.className = "btn";
+>>>>>>> Stashed changes
     popup.appendChild(btn);
-    
+
     // add event listeners for popup
-    handleMouseOver = () => popup.style.display = 'block';
-    handleMouseOut = () => popup.style.display = 'none';
-    profContainer.addEventListener('mouseover', handleMouseOver, {once: false});
-    profContainer.addEventListener('mouseout', handleMouseOut, {once: false});
+    handleMouseOver = () => (popup.style.display = "block");
+    handleMouseOut = () => (popup.style.display = "none");
+    profContainer.addEventListener("mouseover", handleMouseOver, { once: false });
+    profContainer.addEventListener("mouseout", handleMouseOut, { once: false });
 
     return popup;
-}
+};
 
 // returns array of professors
-findProfs = (name) => ((name == 'To be Announced' || name == 'Staff') ? null : name.split(','));
+findProfs = (name) =>
+    name == "To be Announced" || name == "Staff" ? null : name.split(",");
 
-setup = async ()  => {
+setup = async () => {
     // only creates global map of prorfessor names/ids once
     if (profs.size === 0) {
         // console.log('getting professor ids');
@@ -72,9 +85,10 @@ setup = async ()  => {
     }
     addEval(document);
     setTimeout(setup, 1000);
-}
+};
 
 getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
+<<<<<<< Updated upstream
     const id = await getProfessorID(profArr[i]);
     const url = 'https://www.polyratings.com/eval/' + id + '/index.html';
     chrome.runtime.sendMessage(
@@ -126,6 +140,56 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
                     tempDiv.appendChild(newElement);
                     profContainer.replaceChild(tempDiv, section);
                 }
+=======
+    // console.log(profArr[i]);
+    const prof = profs.find(
+        (prof) => prof.firstName + " " + prof.lastName === profArr[i]
+    );
+    if (prof === undefined) {
+        newElement.innerHTML = `${profArr[i]}<br>`;
+        tempDiv.appendChild(newElement);
+        profContainer.replaceChild(tempDiv, section);
+        return;
+    }
+    const popup = initPopup(profContainer, prof);
+    profContainer.appendChild(popup);
+
+    const color = "#D4E9B8";
+    newElement.setAttribute("style", `background-color: ${color}`);
+    newElement.innerHTML = `${prof.firstName} ${prof.lastName}<br>`;
+
+    // only one prof
+    if (profArr.length == 1) {
+        profContainer.replaceChild(newElement, section);
+    }
+    // multiple profs
+    else {
+        tempDiv.appendChild(newElement);
+        profContainer.replaceChild(tempDiv, section);
+    }
+    // else {
+    //     newElement.innerHTML = `${profArr[i]}<br>`;
+    //     tempDiv.appendChild(newElement);
+    //     profContainer.replaceChild(tempDiv, section);
+    // }
+};
+
+getProfessorRatings = async () => {
+    const init = {
+        method: "GET",
+        headers: {
+            accept: "application/vnd.github.v3.raw",
+        },
+    };
+    fetch(
+        "https://api.github.com/repos/Polyratings/polyratings-data/contents/professor-list.json?ref=data",
+        init
+    )
+        .then((response) => {
+            if (response.status != 200) {
+                console.log("error, status code " + response.status);
+                return "error";
+>>>>>>> Stashed changes
             }
             else {
                 newElement.innerHTML = `${profArr[i]}<br>`;
@@ -149,6 +213,7 @@ readCsvValues = () => {
         }).catch((err) => {
             console.log(err);
         })
+<<<<<<< Updated upstream
     });
 }
 
@@ -170,6 +235,12 @@ parseCsvResponse = async () => {
     // console.log(profs);
     // return profs;
 } 
+=======
+        .catch((err) => {
+            console.log("Fetch error: " + err);
+        });
+};
+>>>>>>> Stashed changes
 
 // Use global map to get professor_id from professor_name
 // Names in csv file have no space so removing space from names here 
