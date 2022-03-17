@@ -19,6 +19,8 @@ addEval = () => {
         }
     });
 
+    // ----- schedule builder stuff
+
     console.log("helloooo in addEval");
     // const instructor = document.getElementsByClassName(
     //     "cx-MuiTypography-root css-1xnpogb d-flex align-items-center pb-1 pr-1 cx-MuiTypography-body1"
@@ -26,10 +28,30 @@ addEval = () => {
     // console.log(`instructor test: ${instructor}`);
     // const element = document.getElementById("app");
     // const nodes = document.querySelectorAll("dl.my-0 > dd");
-    const blah = document.getElementsByClassName(
-        "cx-MuiTypography-root css-1xnpogb d-flex align-items-center pb-1 pr-1 cx-MuiTypography-body1"
-    )[0];
-    console.log(blah);
+    // const blah = document.getElementsByClassName(
+    //     "cx-MuiTypography-root css-1xnpogb d-flex align-items-center pb-1 pr-1 cx-MuiTypography-body1"
+    // )[0];
+
+    const blah = document.querySelectorAll('[aria-label*="MTG_INSTR$"]');
+
+    // in a console
+    const div1 = document.getElementById("div1");
+    //=> <div id="div1">Hi Champ!</div>
+
+    const exampleAttr = div1.getAttribute("aria-label");
+    //=> "div1"
+
+    const align = div1.getAttribute("align");
+    //=> null
+
+    // let container = document.querySelectorAll(
+    //     "p-3 d-flex align-items-start flex-wrap > .session > dl > dd"
+    // );
+    // for (let i = 0; i < container.length; i++) {
+    //     let newElement =
+    // }
+    // console.log(blah);
+
     // document.getElementById("demo").innerHTML = nodes.length;
     // const blah = document.querySelectorAll('[id*="app"]');
     // console.log(blah);
