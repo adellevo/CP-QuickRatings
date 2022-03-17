@@ -11,33 +11,24 @@
         {
             "matches": [
                 "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?*",
-                "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?*"
+                "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?*",
+                "https://cmsweb.pscs.calpoly.edu/psp/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?*"
             ],
             "all_frames": true,
-            "css": [
-                "main.css"
-            ],
-            "js": [
-                "main.js"
-            ],
+            "css": ["main.css"],
+            "js": ["main.js"],
             "run_at": "document_end"
         }
     ],
-    "host_permissions": [
-        "https://www.polyratings.com/*"
-    ],
+    "host_permissions": ["https://www.polyratings.com/*"],
     "manifest_version": 3,
     "background": {
         "service_worker": "background.js"
     },
     "web_accessible_resources": [
         {
-            "resources": [
-                "profIds.csv"
-            ],
-            "matches": [
-                "<all_urls>"
-            ]
+            "resources": ["profIds.csv"],
+            "matches": ["<all_urls>"]
         }
     ]
 }
