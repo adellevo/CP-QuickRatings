@@ -22,10 +22,6 @@ addEvalSC = () => {
 };
 
 addEvalSB = () => {
-    // if (
-    //     window.location.href ==
-    //     "https://cmsweb.pscs.calpoly.edu/psp/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?"
-    // ) {
     let iframe = document.getElementById("ptifrmtgtframe");
     if (iframe != undefined) {
         if (iframe.contentDocument != undefined) {
@@ -35,7 +31,6 @@ addEvalSB = () => {
                     '[aria-label="Sections List"]'
                 )[0];
                 if (sectionsList != undefined) {
-                    // console.log("hiiii");
                     let sectionInfoContainer = sectionsList.getElementsByClassName(
                         "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
                     );
@@ -46,16 +41,7 @@ addEvalSB = () => {
                                 let profNameElement = sectionInfo
                                     .getElementsByTagName("dd")
                                     .item(0);
-
-                                console.log(profNameElement);
-
                                 let dd = document.createElement("dd");
-                                // const linkText = document.createTextNode(
-                                //     profNameElement.innerText
-                                // );
-                                // a.appendChild(linkText);
-                                // a.href = "https://polyratings.dev/";
-
                                 let link = getLink(profNameElement.innerText);
                                 if (link !== undefined) {
                                     dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
@@ -65,21 +51,6 @@ addEvalSB = () => {
                                     );
                                     console.log(dd);
                                 }
-                                // dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
-                                // profNameElement.parentNode.replaceChild(
-                                //     dd,
-                                //     profNameElement
-                                // );
-                                // console.log(dd);
-                                // document.body.appendChild(a);
-                                // console.log(a.innerHTML);
-
-                                // const btn = document.createElement("div");
-                                // btn.innerHTML = `<a href='https://polyratings.dev/teacher/${prof.id}' target='_blank'> View on PolyRatings </a>`;
-                                // btn.className = "btn";
-                                // popup.appendChild(btn);
-                                // profNameElement.parentNode.replaceChild()
-                                // console.log(profNameElement);
                             }
                         }
                     }
