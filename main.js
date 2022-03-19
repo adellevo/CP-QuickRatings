@@ -3,6 +3,7 @@ let profs = new Map();
 // profArr = array of profs for that section
 addEvalSC = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
+
     sectionArr.forEach((section) => {
         let profArr = findProfs(section.innerText);
         if (profArr != null) {
@@ -21,27 +22,22 @@ addEvalSC = () => {
 };
 
 addEvalSB = () => {
-    console.log("addEvalSB");
-    // ------- schedule builder -------
-    var iframe = document.getElementById("ptifrmtgtframe");
-    if (iframe.contentDocument) {
-        // let iframeBody = iframe.contentDocument.body;
-        // // let iName = iframe.contentDocument.body.getElementsByClassName(
-        // //     "cx-MuiTypography-root css-1xnpogb d-flex align-items-center pb-1 pr-1 cx-MuiTypography-body1"
-        // // );
-        let iframeBody = iframe.contentDocument.body;
-        let sectionsList = iframeBody.querySelectorAll('[aria-label="Sections List"]')[0];
+    let iframe = document.getElementById("ptifrmtgtframe");
+
+    if (iframe != undefined) {
+        let sectionsList = iframe.contentDocument.body.querySelectorAll(
+            '[aria-label="Sections List"]'
+        )[0];
+
         if (sectionsList != undefined) {
-            // let divList = sectionsList.getElementsByTagName("div");
-            // if (divList != undefined) {
-            //     console.log(divList);
-            // }
             let sectionInfoContainer = sectionsList.getElementsByClassName(
                 "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
             );
+
             if (sectionInfoContainer != undefined) {
                 for (i = 0; i < sectionInfoContainer.length; i++) {
                     let sectionInfo = sectionInfoContainer.item(i);
+
                     if (sectionInfo != undefined) {
                         let profNameElement = sectionInfo
                             .getElementsByTagName("dd")
@@ -50,11 +46,7 @@ addEvalSB = () => {
                     }
                 }
             }
-
-            // console.log(divList);
         }
-        // console.log(sectionsList.getElementsByTagName("dd").innerText);
-        // console.log(iframeBody.innerHTML);
     }
 };
 
