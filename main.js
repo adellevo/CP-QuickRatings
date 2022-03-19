@@ -22,31 +22,72 @@ addEvalSC = () => {
 };
 
 addEvalSB = () => {
+    // if (
+    //     window.location.href ==
+    //     "https://cmsweb.pscs.calpoly.edu/psp/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?"
+    // ) {
     let iframe = document.getElementById("ptifrmtgtframe");
     if (iframe != undefined) {
-        let iframeBody = iframe.contentDocument.body;
-        if (iframeBody != undefined) {
-            let sectionsList = iframeBody.querySelectorAll(
-                '[aria-label="Sections List"]'
-            )[0];
-            if (sectionsList != undefined) {
-                let sectionInfoContainer = sectionsList.getElementsByClassName(
-                    "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
-                );
-                if (sectionInfoContainer != undefined) {
-                    for (i = 0; i < sectionInfoContainer.length; i++) {
-                        let sectionInfo = sectionInfoContainer.item(i);
-                        if (sectionInfo != undefined) {
-                            let profNameElement = sectionInfo
-                                .getElementsByTagName("dd")
-                                .item(0);
-                            console.log(profNameElement);
+        if (iframe.contentDocument != undefined) {
+            let iframeBody = iframe.contentDocument.body;
+            if (iframeBody != undefined) {
+                let sectionsList = iframeBody.querySelectorAll(
+                    '[aria-label="Sections List"]'
+                )[0];
+                if (sectionsList != undefined) {
+                    // console.log("hiiii");
+                    let sectionInfoContainer = sectionsList.getElementsByClassName(
+                        "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
+                    );
+                    if (sectionInfoContainer != undefined) {
+                        for (i = 0; i < sectionInfoContainer.length; i++) {
+                            let sectionInfo = sectionInfoContainer.item(i);
+                            if (sectionInfo != undefined) {
+                                let profNameElement = sectionInfo
+                                    .getElementsByTagName("dd")
+                                    .item(0);
+
+                                console.log(profNameElement);
+
+                                let dd = document.createElement("dd");
+                                // const linkText = document.createTextNode(
+                                //     profNameElement.innerText
+                                // );
+                                // a.appendChild(linkText);
+                                // a.href = "https://polyratings.dev/";
+
+                                let link = getLink(profNameElement.innerText);
+                                if (link !== undefined) {
+                                    dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
+                                    profNameElement.parentNode.replaceChild(
+                                        dd,
+                                        profNameElement
+                                    );
+                                    console.log(dd);
+                                }
+                                // dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
+                                // profNameElement.parentNode.replaceChild(
+                                //     dd,
+                                //     profNameElement
+                                // );
+                                // console.log(dd);
+                                // document.body.appendChild(a);
+                                // console.log(a.innerHTML);
+
+                                // const btn = document.createElement("div");
+                                // btn.innerHTML = `<a href='https://polyratings.dev/teacher/${prof.id}' target='_blank'> View on PolyRatings </a>`;
+                                // btn.className = "btn";
+                                // popup.appendChild(btn);
+                                // profNameElement.parentNode.replaceChild()
+                                // console.log(profNameElement);
+                            }
                         }
                     }
                 }
             }
         }
     }
+    // }
 };
 
 initPopup = (profContainer, prof) => {
@@ -88,6 +129,15 @@ initPopup = (profContainer, prof) => {
     profContainer.addEventListener("mouseout", handleMouseOut, { once: false });
 
     return popup;
+};
+
+getLink = (sbProf) => {
+    const prof = profs.find((prof) => prof.firstName + " " + prof.lastName === sbProf);
+    if (prof != undefined) {
+        return `https://polyratings.dev/teacher/${prof.id}`;
+    } else {
+        return undefined;
+    }
 };
 
 // returns array of professors
