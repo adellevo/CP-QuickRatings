@@ -49,7 +49,7 @@ addEvalSB = () => {
                                         dd,
                                         profNameElement
                                     );
-                                    console.log(dd);
+                                    // console.log(dd);
                                 }
                             }
                         }
@@ -58,7 +58,6 @@ addEvalSB = () => {
             }
         }
     }
-    // }
 };
 
 initPopup = (profContainer, prof) => {
