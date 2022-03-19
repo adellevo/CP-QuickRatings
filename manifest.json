@@ -1,12 +1,12 @@
 {
-    "name": "PolyRatings",
-    "version": "1",
+    "name": "Polyratings",
+    "version": "2",
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
         "128": "icon128.png"
     },
-    "description": "Chrome extension for PolyRatings",
+    "description": "Easily view Polyratings data in Student Center",
     "content_scripts": [
         {
             "matches": [
@@ -21,14 +21,5 @@
         }
     ],
     "host_permissions": ["https://www.polyratings.com/*"],
-    "manifest_version": 3,
-    "background": {
-        "service_worker": "background.js"
-    },
-    "web_accessible_resources": [
-        {
-            "resources": ["profIds.csv"],
-            "matches": ["<all_urls>"]
-        }
-    ]
+    "manifest_version": 3
 }
