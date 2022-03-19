@@ -23,26 +23,25 @@ addEvalSC = () => {
 
 addEvalSB = () => {
     let iframe = document.getElementById("ptifrmtgtframe");
-
     if (iframe != undefined) {
-        let sectionsList = iframe.contentDocument.body.querySelectorAll(
-            '[aria-label="Sections List"]'
-        )[0];
-
-        if (sectionsList != undefined) {
-            let sectionInfoContainer = sectionsList.getElementsByClassName(
-                "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
-            );
-
-            if (sectionInfoContainer != undefined) {
-                for (i = 0; i < sectionInfoContainer.length; i++) {
-                    let sectionInfo = sectionInfoContainer.item(i);
-
-                    if (sectionInfo != undefined) {
-                        let profNameElement = sectionInfo
-                            .getElementsByTagName("dd")
-                            .item(0);
-                        console.log(profNameElement);
+        let iframeBody = iframe.contentDocument.body;
+        if (iframeBody != undefined) {
+            let sectionsList = iframeBody.querySelectorAll(
+                '[aria-label="Sections List"]'
+            )[0];
+            if (sectionsList != undefined) {
+                let sectionInfoContainer = sectionsList.getElementsByClassName(
+                    "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
+                );
+                if (sectionInfoContainer != undefined) {
+                    for (i = 0; i < sectionInfoContainer.length; i++) {
+                        let sectionInfo = sectionInfoContainer.item(i);
+                        if (sectionInfo != undefined) {
+                            let profNameElement = sectionInfo
+                                .getElementsByTagName("dd")
+                                .item(0);
+                            console.log(profNameElement);
+                        }
                     }
                 }
             }
