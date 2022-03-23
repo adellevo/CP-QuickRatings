@@ -13,10 +13,16 @@ addEvalSC = () => {
 
             // account for multiple profs
             let tempDiv = document.createElement("div");
-            // let nCount = 0; // number of nonexistent profs
             for (let i = 0; i < profArr.length; i++) {
                 let newElement = document.createElement("span");
-                getProfessorInfo(profContainer, profArr, i, tempDiv, newElement, section);
+                getProfessorInfoSC(
+                    profContainer,
+                    profArr,
+                    i,
+                    tempDiv,
+                    newElement,
+                    section
+                );
             }
         }
     });
@@ -42,29 +48,7 @@ addEvalSB = () => {
                                 let profNameElement = sectionInfo
                                     .getElementsByTagName("dd")
                                     .item(0);
-                                // let dd = document.createElement("dd");
-                                // dd.setAttribute(
-                                //     "style",
-                                //     `background-color: #D4E9B8; text-decoration: none; margin-left: -1px`
-                                // );
-                                // let link = getLink(profNameElement.innerText);
-                                // if (link !== undefined) {
-                                //     dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
-                                //     profNameElement.parentNode.replaceChild(
-                                //         dd,
-                                //         profNameElement
-                                //     );
-
-                                let tempDiv = document.createElement("div");
-                                let newElement = document.createElement("dd");
-                                getProfessorInfo2(
-                                    profNameElement.parentNode,
-                                    profNameElement.innerText,
-                                    tempDiv,
-                                    newElement,
-                                    profNameElement,
-                                    sectionInfo
-                                );
+                                getProfessorInfoSB(profNameElement);
                             }
                         }
                     }
@@ -72,7 +56,6 @@ addEvalSB = () => {
             }
         }
     }
-    // }
 };
 
 initPopup = (profContainer, prof) => {
@@ -80,6 +63,10 @@ initPopup = (profContainer, prof) => {
     let popup = document.createElement("div");
     popup.style.display = "none";
     popup.className = "popup";
+    popup.setAttribute(
+        "style",
+        "width: 136px;font-size: 11px;font-family: Arial, Helvetica, sans-serif;border-radius: 5px;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;background-color: white;margin: 5px;padding: 6px;color: var(--gray);text-align: center;vertical-align: middle;font-weight: 400;"
+    );
 
     // popup header
     const titleDiv = document.createElement("div");
@@ -135,25 +122,11 @@ initPopup = (profContainer, prof) => {
     return popup;
 };
 
-getProf = (sbProf) => {
-    return profs.find((prof) => prof.firstName + " " + prof.lastName === sbProf);
-};
-
-getLink = (sbProf) => {
-    const prof = profs.find((prof) => prof.firstName + " " + prof.lastName === sbProf);
-    if (prof != undefined) {
-        return `https://polyratings.dev/teacher/${prof.id}`;
-    } else {
-        return undefined;
-    }
-};
-
 // returns array of professors
 findProfs = (name) =>
     name == "To be Announced" || name == "Staff" ? null : name.split(",");
 
-getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, section) => {
-    // console.log(profArr[i]);
+getProfessorInfoSC = async (profContainer, profArr, i, tempDiv, newElement, section) => {
     const prof = profs.find(
         (prof) => prof.firstName + " " + prof.lastName === profArr[i]
     );
@@ -166,8 +139,7 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
     const popup = initPopup(profContainer, prof);
     profContainer.appendChild(popup);
 
-    const color = "#D4E9B8";
-    newElement.setAttribute("style", `background-color: ${color}`);
+    newElement.setAttribute("style", "background-color: #D4E9B8");
     newElement.innerHTML = `${prof.firstName} ${prof.lastName}<br>`;
 
     // only one prof
@@ -179,42 +151,19 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
         tempDiv.appendChild(newElement);
         profContainer.replaceChild(tempDiv, section);
     }
-    // else {
-    //     newElement.innerHTML = `${profArr[i]}<br>`;
-    //     tempDiv.appendChild(newElement);
-    //     profContainer.replaceChild(tempDiv, section);
-    // }
 };
 
-getProfessorInfo2 = async (
-    ogParent,
-    profName,
-    tempDiv,
-    ddElement,
-    ogChild,
-    sectionInfo
-) => {
+getProfessorInfoSB = async (ogChild) => {
+    const profName = ogChild.innerText;
     const prof = profs.find((prof) => prof.firstName + " " + prof.lastName === profName);
-    console.log("proffff: ", prof);
     if (prof === undefined) {
-        // ddElement.innerHTML = `${profName}<br>`;
-        // tempDiv.appendChild(ddElement);
-        // ogParent.replaceChild(tempDiv, ogChild);
         return;
     }
-    const color = "#D4E9B8";
-    ogChild.setAttribute("style", `background-color: ${color}`);
-    // ogChild.innerText = `${prof.firstName} ${prof.lastName}`;
+    ogChild.setAttribute("style", "background-color: #D4E9B8");
     const popup = initPopup(ogChild, prof);
-    // popup.className = "popup";
     if (ogChild.children.length === 0) {
         ogChild.appendChild(popup);
     }
-
-    // const color = "#D4E9B8";
-    // newElement.setAttribute("style", `background-color: ${color}`);
-    // newElement.innerHTML = `${prof.firstName} ${prof.lastName}<br>`;
-    // profContainer.replaceChild(newElement, section);
 };
 
 getProfessorRatings = async () => {
