@@ -4,7 +4,6 @@ let profs = new Map();
 // profArr = array of profs for that section
 addEvalSC = () => {
     const sectionArr = document.querySelectorAll('[id*="MTG_INSTR$"]');
-
     sectionArr.forEach((section) => {
         let profArr = findProfs(section.innerText);
         if (profArr != null) {
@@ -63,10 +62,10 @@ initPopup = (profContainer, prof) => {
     let popup = document.createElement("div");
     popup.style.display = "none";
     popup.className = "popup";
-    popup.setAttribute(
-        "style",
-        "width: 136px;font-size: 11px;font-family: Arial, Helvetica, sans-serif;border-radius: 5px;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;background-color: white;margin: 5px;padding: 6px;color: var(--gray);text-align: center;vertical-align: middle;font-weight: 400;"
-    );
+    // popup.setAttribute(
+    //     "style",
+    //     "width: 136px;font-size: 11px;font-family: Arial, Helvetica, sans-serif;border-radius: 5px;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;background-color: white;margin: 5px;padding: 6px;color: var(--gray);text-align: center;vertical-align: middle;font-weight: 400;"
+    // );
 
     // popup header
     const titleDiv = document.createElement("div");
