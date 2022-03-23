@@ -1,4 +1,5 @@
 let profs = new Map();
+
 // sectionArr = array of sections
 // profArr = array of profs for that section
 addEvalSC = () => {
@@ -41,16 +42,29 @@ addEvalSB = () => {
                                 let profNameElement = sectionInfo
                                     .getElementsByTagName("dd")
                                     .item(0);
-                                let dd = document.createElement("dd");
-                                let link = getLink(profNameElement.innerText);
-                                if (link !== undefined) {
-                                    dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
-                                    profNameElement.parentNode.replaceChild(
-                                        dd,
-                                        profNameElement
-                                    );
-                                    console.log(dd);
-                                }
+                                // let dd = document.createElement("dd");
+                                // dd.setAttribute(
+                                //     "style",
+                                //     `background-color: #D4E9B8; text-decoration: none; margin-left: -1px`
+                                // );
+                                // let link = getLink(profNameElement.innerText);
+                                // if (link !== undefined) {
+                                //     dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
+                                //     profNameElement.parentNode.replaceChild(
+                                //         dd,
+                                //         profNameElement
+                                //     );
+
+                                let tempDiv = document.createElement("div");
+                                let newElement = document.createElement("dd");
+                                getProfessorInfo2(
+                                    profNameElement.parentNode,
+                                    profNameElement.innerText,
+                                    tempDiv,
+                                    newElement,
+                                    profNameElement,
+                                    sectionInfo
+                                );
                             }
                         }
                     }
@@ -69,14 +83,33 @@ initPopup = (profContainer, prof) => {
 
     // popup header
     const titleDiv = document.createElement("div");
-    titleDiv.innerHTML = `<h1>${prof.firstName} ${prof.lastName}</h1><p>Based on ${prof.numEvals} ratings...</p>`;
+    prof.numEvals == 1
+        ? (titleDiv.innerHTML = `<h1>${prof.firstName} ${prof.lastName}</h1><p>Based on ${prof.numEvals} rating...</p>`)
+        : (titleDiv.innerHTML = `<h1>${prof.firstName} ${prof.lastName}</h1><p>Based on ${prof.numEvals} ratings...</p>`);
     popup.appendChild(titleDiv);
+
+    // make ratings have consistent formatting
+    let displayOR = prof.overallRating.toString();
+    let displayMC = prof.materialClear.toString();
+    let displaySD = prof.studentDifficulties.toString();
+    orPadLen = 4 - displayOR.length;
+    if (orPadLen !== 0) {
+        orPadLen === 3 ? (displayOR += ".00") : (displayOR += "0" * orPadLen);
+    }
+    mcPadLen = 4 - displayMC.length;
+    if (mcPadLen !== 0) {
+        mcPadLen === 3 ? (displayMC += ".00") : (displayMC += "0" * mcPadLen);
+    }
+    sdPadLen = 4 - displaySD.length;
+    if (sdPadLen !== 0) {
+        sdPadLen === 3 ? (displaySD += ".00") : (displaySD += "0" * sdPadLen);
+    }
 
     // create table rows
     const overview = [
-        `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prof.overallRating} / 4.00`,
-        `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${prof.materialClear} / 4.00`,
-        `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${prof.studentDifficulties} / 4.00`,
+        `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${displayOR} / 4.00`,
+        `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${displayMC} / 4.00`,
+        `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${displaySD} / 4.00`,
     ];
     overview.forEach((subrating, i) => {
         let subDiv = document.createElement("div");
@@ -87,9 +120,9 @@ initPopup = (profContainer, prof) => {
             : (subDiv.className = "subrating-odd");
     });
 
-    // PolyRatings link
+    // Polyratings link
     const btn = document.createElement("div");
-    btn.innerHTML = `<a href='https://polyratings.dev/teacher/${prof.id}' target='_blank'> View on PolyRatings </a>`;
+    btn.innerHTML = `<a href='https://polyratings.dev/teacher/${prof.id}' target='_blank'> View on Polyratings </a>`;
     btn.className = "btn";
     popup.appendChild(btn);
 
@@ -100,6 +133,10 @@ initPopup = (profContainer, prof) => {
     profContainer.addEventListener("mouseout", handleMouseOut, { once: false });
 
     return popup;
+};
+
+getProf = (sbProf) => {
+    return profs.find((prof) => prof.firstName + " " + prof.lastName === sbProf);
 };
 
 getLink = (sbProf) => {
@@ -147,6 +184,37 @@ getProfessorInfo = async (profContainer, profArr, i, tempDiv, newElement, sectio
     //     tempDiv.appendChild(newElement);
     //     profContainer.replaceChild(tempDiv, section);
     // }
+};
+
+getProfessorInfo2 = async (
+    ogParent,
+    profName,
+    tempDiv,
+    ddElement,
+    ogChild,
+    sectionInfo
+) => {
+    const prof = profs.find((prof) => prof.firstName + " " + prof.lastName === profName);
+    console.log("proffff: ", prof);
+    if (prof === undefined) {
+        // ddElement.innerHTML = `${profName}<br>`;
+        // tempDiv.appendChild(ddElement);
+        // ogParent.replaceChild(tempDiv, ogChild);
+        return;
+    }
+    const color = "#D4E9B8";
+    ogChild.setAttribute("style", `background-color: ${color}`);
+    // ogChild.innerText = `${prof.firstName} ${prof.lastName}`;
+    const popup = initPopup(ogChild, prof);
+    // popup.className = "popup";
+    if (ogChild.children.length === 0) {
+        ogChild.appendChild(popup);
+    }
+
+    // const color = "#D4E9B8";
+    // newElement.setAttribute("style", `background-color: ${color}`);
+    // newElement.innerHTML = `${prof.firstName} ${prof.lastName}<br>`;
+    // profContainer.replaceChild(newElement, section);
 };
 
 getProfessorRatings = async () => {
