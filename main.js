@@ -1,30 +1,13 @@
 let profs = new Map();
-// sectionArr = array of sections
-// profArr = array of profs for that section
+
 addEvalSC = () => {
-    const sectionArr = document.querySelectorAll('span[id*="MTG_INSTR$"]');
+    const sectionArr = document.querySelectorAll('span[id*="MTG_INSTR$"]'); // array of sections
     sectionArr.forEach((section) => {
-        let profArr = findProfs(section.innerText);
+        let profArr = findProfs(section.innerText); // array of profs for that section
         if (profArr != null) {
-            // console.log("section: ", section);
-            // console.log("styleeeee: ", getComputedStyle(sectionArr).cursor);
             let profContainer = section.parentNode.parentNode;
             profContainer.classList.add("parContainer");
-
-            // account for multiple profs
-            let tempDiv = document.createElement("div");
-            // let nCount = 0; // number of nonexistent profs
-            for (let i = 0; i < profArr.length; i++) {
-                let newElement = document.createElement("span");
-                getProfessorInfoSC(
-                    profContainer,
-                    profArr,
-                    i,
-                    tempDiv,
-                    newElement,
-                    section
-                );
-            }
+            getProfessorInfoSC(profContainer, profArr, section);
         }
     });
 };
@@ -92,7 +75,7 @@ addEvalSB = () => {
     // }
 };
 
-initPopup = (profContainer, prof, section) => {
+initPopup = (prof, section) => {
     // create popup
     let popup = document.createElement("div");
     // popup.style.display = "none";
@@ -161,39 +144,53 @@ initPopup = (profContainer, prof, section) => {
 };
 
 // returns array of professors
-findProfs = (name) =>
-    name == "To be Announced" || name == "Staff" ? null : name.split(",");
-
-getProfessorInfoSC = async (profContainer, profArr, i, tempDiv, newElement, section) => {
-    const prof = profs.find(
-        (prof) => prof.firstName + " " + prof.lastName === profArr[i]
-    );
-    if (prof === undefined) {
-        return;
+findProfs = (name) => {
+    if (name == "To be Announced" || name == "Staff") {
+        return null;
+    } else {
+        return name.split(",").map((item) => item.trim());
     }
+};
 
-    // only one prof
-    if (profArr.length == 1) {
-        if (profContainer.children.length === 1) {
-            const popup = initPopup(profContainer, prof, section);
-            profContainer.appendChild(popup);
-            section.style.cssText += "background-color: #D4E9B8;";
-        }
-    }
-    // multiple profs
-    else {
-        // console.log("uhhh should not go in here lmao");
-        if (profContainer.children.length <= profArr.length) {
-            const popup = initPopup(profContainer, prof, section);
-            profContainer.appendChild(popup);
-            let newSpan = document.createElement("span");
-            newSpan.className = "PSLONGEDITBOX";
+getProfessorInfoSC = async (profContainer, profArr, section) => {
+    for (let i = 0; i < profArr.length; i++) {
+        const prof = profs.find(
+            (prof) => prof.firstName + " " + prof.lastName === profArr[i]
+        );
 
-            section.firstChild.style.cssText += "background-color: #D4E9B8;";
-            section.style.cssText += "margin-bottom: 4px;";
+        // only one prof
+        if (profArr.length == 1) {
+            if (profContainer.children.length === 1) {
+                if (prof !== undefined) {
+                    const popup = initPopup(prof, section);
+                    profContainer.appendChild(popup);
+                    section.style.cssText += "background-color: #D4E9B8;";
+                }
+            }
         }
-        // tempDiv.appendChild(newElement);
-        // profContainer.replaceChild(tempDiv, section);
+
+        // multiple profs
+        else {
+            if (section.children.length < profArr.length) {
+                /* remove initial span with all profs combined together */
+                if (i == 0) {
+                    section.innerText = "";
+                }
+
+                /* create individual spans for each prof */
+                let newSpan = document.createElement("span");
+                newSpan.innerHTML = `${profArr[i]}<br>`;
+                section.appendChild(newSpan);
+
+                /* append popups to container */
+                if (prof !== undefined) {
+                    newSpan.style.cssText +=
+                        "background-color: #D4E9B8; margin-bottom: 4px;";
+                    const popup = initPopup(prof, section);
+                    profContainer.appendChild(popup);
+                }
+            }
+        }
     }
 };
 
@@ -211,7 +208,7 @@ getProfessorInfoSB = async (profContainer, profArr, i, tempDiv, newElement, sect
     // only one prof
     if (profArr.length == 1) {
         if (profContainer.children.length === 2) {
-            const popup = initPopup(profContainer, prof, section);
+            const popup = initPopup(prof, section);
             profContainer.appendChild(popup);
             section.style.cssText += "background-color: #D4E9B8;";
             // profContainer.replaceChild(newElement, section);
