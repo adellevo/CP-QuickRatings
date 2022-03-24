@@ -16,18 +16,6 @@ addEvalSB = () => {
     let iframe = document.getElementById("ptifrmtgtframe");
     if (iframe != undefined) {
         if (iframe.contentDocument != undefined) {
-            // ---- start: for popup testing later ----
-            // if (iframe.contentDocument.querySelector("#custom-css") === null) {
-            //     console.log("yoooo uhhh i'm in here");
-            //     let link = document.createElement("link");
-            //     link.id = "custom-css";
-            //     link.rel = "stylesheet";
-            //     link.type = "text/css";
-            //     link.href = "main.css";
-            //     let iframeHead = iframe.contentDocument.getElementsByTagName("head")[0];
-            //     iframeHead.appendChild(link);
-            // }
-            // ---- end: for popup testing later ----
             let iframeBody = iframe.contentDocument.body;
             if (iframeBody != undefined) {
                 let sectionsList = iframeBody.querySelectorAll(
@@ -68,8 +56,6 @@ initPopup = (prof, section) => {
     // create popup
     let popup = document.createElement("div");
     popup.className = "hidden-popup";
-    // popup.style.cssText =
-    //     "visibility: hidden;position: absolute; width: 136px;height: 0;overflow: hidden;font-size: 11px;font-weight: 400;font-family: Arial, Helvetica, sans-serif;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;background-color: white;margin: 5px;padding: 6px;color: #494a4;text-align: center;vertical-align: middle;border-radius: 5px;";
 
     // popup header
     const titleDiv = document.createElement("div");
@@ -114,8 +100,6 @@ initPopup = (prof, section) => {
     const btn = document.createElement("div");
     btn.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> View on Polyratings </a>`;
     btn.className = "btn";
-    // btn.style.cssText =
-    //     "background-color: #5b6448;padding: 5px;border-radius: 2px;border-style: none;text-decoration: none;margin-top: 10px;letter-spacing: 0.2px;";
     popup.appendChild(btn);
 
     // add event listener for popup
