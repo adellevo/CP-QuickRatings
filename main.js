@@ -7,7 +7,7 @@ addEvalSC = () => {
         if (profArr != null) {
             let profContainer = section.parentNode.parentNode;
             profContainer.classList.add("parContainer");
-            getProfessorInfoSC(profContainer, profArr, section);
+            getProfessorInfo(profContainer, profArr, section, "SC");
         }
     });
 };
@@ -16,6 +16,18 @@ addEvalSB = () => {
     let iframe = document.getElementById("ptifrmtgtframe");
     if (iframe != undefined) {
         if (iframe.contentDocument != undefined) {
+            // ---- start: for popup testing later ----
+            // if (iframe.contentDocument.querySelector("#custom-css") === null) {
+            //     console.log("yoooo uhhh i'm in here");
+            //     let link = document.createElement("link");
+            //     link.id = "custom-css";
+            //     link.rel = "stylesheet";
+            //     link.type = "text/css";
+            //     link.href = "main.css";
+            //     let iframeHead = iframe.contentDocument.getElementsByTagName("head")[0];
+            //     iframeHead.appendChild(link);
+            // }
+            // ---- end: for popup testing later ----
             let iframeBody = iframe.contentDocument.body;
             if (iframeBody != undefined) {
                 let sectionsList = iframeBody.querySelectorAll(
@@ -32,38 +44,16 @@ addEvalSB = () => {
                                 let section = sectionInfo
                                     .getElementsByTagName("dd")
                                     .item(0);
-                                // let dd = document.createElement("dd");
-                                // let link = getLink(profNameElement.innerText);
-                                // if (link !== undefined) {
-                                //     dd.innerHTML = `<a href=${link} target='_blank'> ${profNameElement.innerText} </a>`;
-                                //     profNameElement.parentNode.replaceChild(
-                                //         dd,
-                                //         profNameElement
-                                //     );
-                                //     console.log(dd);
-                                // }
-                                // getProfessorInfoSB(profNameElement);
-
                                 let profArr = findProfs(section.innerText);
                                 if (profArr != null) {
                                     let profContainer = section.parentNode;
                                     profContainer.classList.add("parContainer");
-
-                                    // account for multiple profs
-                                    let tempDiv = document.createElement("div");
-                                    // let nCount = 0; // number of nonexistent profs
-                                    for (let i = 0; i < profArr.length; i++) {
-                                        let newElement = document.createElement("dd");
-                                        // getProfessorInfoSB(profNameElement);
-                                        getProfessorInfoSB(
-                                            profContainer,
-                                            profArr,
-                                            i,
-                                            tempDiv,
-                                            newElement,
-                                            section
-                                        );
-                                    }
+                                    getProfessorInfo(
+                                        profContainer,
+                                        profArr,
+                                        section,
+                                        "SB"
+                                    );
                                 }
                             }
                         }
@@ -72,17 +62,14 @@ addEvalSB = () => {
             }
         }
     }
-    // }
 };
 
 initPopup = (prof, section) => {
     // create popup
     let popup = document.createElement("div");
-    // popup.style.display = "none";
     popup.className = "hidden-popup";
-    // popup.setAttribute("style", "height: 0");
-    // popup.style.height = "0";
-    // popup.classList.add(popuptext);
+    // popup.style.cssText =
+    //     "visibility: hidden;position: absolute; width: 136px;height: 0;overflow: hidden;font-size: 11px;font-weight: 400;font-family: Arial, Helvetica, sans-serif;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;background-color: white;margin: 5px;padding: 6px;color: #494a4;text-align: center;vertical-align: middle;border-radius: 5px;";
 
     // popup header
     const titleDiv = document.createElement("div");
@@ -123,22 +110,18 @@ initPopup = (prof, section) => {
             : (subDiv.className = "subrating-odd");
     });
 
-    // PolyRatings link
+    // Polyratings link
     const btn = document.createElement("div");
-    btn.innerHTML = `<a href='https://polyratings.dev/teacher/${prof.id}' target='_blank'> View on PolyRatings </a>`;
+    btn.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> View on Polyratings </a>`;
     btn.className = "btn";
+    // btn.style.cssText =
+    //     "background-color: #5b6448;padding: 5px;border-radius: 2px;border-style: none;text-decoration: none;margin-top: 10px;letter-spacing: 0.2px;";
     popup.appendChild(btn);
 
     // add event listener for popup
     eventHandler = () => popup.classList.toggle("visible-popup");
     section.addEventListener("click", eventHandler);
     section.style.cssText += "cursor:pointer;";
-    // console.log("cursor: ", window.getComputedStyle(section.cursor));
-    // profContainer.addEventListener("mouseout", eventHandler);
-
-    // handleMouseOut = () => (popup.style.display = "none");
-    // profContainer.addEventListener("mouseover", handleMouseOver, { once: false });
-    // profContainer.addEventListener("mouseout", handleMouseOut, { once: false });
 
     return popup;
 };
@@ -152,7 +135,7 @@ findProfs = (name) => {
     }
 };
 
-getProfessorInfoSC = async (profContainer, profArr, section) => {
+getProfessorInfo = async (profContainer, profArr, section, platform) => {
     for (let i = 0; i < profArr.length; i++) {
         const prof = profs.find(
             (prof) => prof.firstName + " " + prof.lastName === profArr[i]
@@ -160,71 +143,52 @@ getProfessorInfoSC = async (profContainer, profArr, section) => {
 
         // only one prof
         if (profArr.length == 1) {
-            if (profContainer.children.length === 1) {
-                if (prof !== undefined) {
+            if (prof !== undefined) {
+                if (platform == "SC" && profContainer.children.length === 1) {
                     const popup = initPopup(prof, section);
                     profContainer.appendChild(popup);
                     section.style.cssText += "background-color: #D4E9B8;";
+                } else if (platform == "SB" && profContainer.children.length === 2) {
+                    section.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a>`;
                 }
             }
         }
 
         // multiple profs
         else {
-            if (section.children.length < profArr.length) {
-                /* remove initial span with all profs combined together */
-                if (i == 0) {
-                    section.innerText = "";
+            if (i == 0) section.innerText = ""; // remove initial text with all profs combined together
+            let uniqueProf = document.createElement("span"); // create span for individual profs
+
+            if (platform == "SC") {
+                if (section.children.length < profArr.length) {
+                    uniqueProf.innerHTML = `${profArr[i]}<br>`;
+                    section.appendChild(uniqueProf);
+
+                    // append popup to container
+                    if (prof !== undefined) {
+                        uniqueProf.style.cssText +=
+                            "background-color: #D4E9B8; margin-bottom: 4px;";
+                        const popup = initPopup(prof, section);
+                        profContainer.appendChild(popup);
+                    }
                 }
-
-                /* create individual spans for each prof */
-                let newSpan = document.createElement("span");
-                newSpan.innerHTML = `${profArr[i]}<br>`;
-                section.appendChild(newSpan);
-
-                /* append popups to container */
-                if (prof !== undefined) {
-                    newSpan.style.cssText +=
-                        "background-color: #D4E9B8; margin-bottom: 4px;";
-                    const popup = initPopup(prof, section);
-                    profContainer.appendChild(popup);
+            } else if (platform == "SB") {
+                if (section.children.length < profArr.length * 2) {
+                    if (prof !== undefined) {
+                        uniqueProf.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a>`;
+                    } else {
+                        uniqueProf.innerHTML = `${profArr[i]}`;
+                    }
+                    section.appendChild(uniqueProf);
+                    if (section.children.length != profArr.length * 2 - 1) {
+                        let comma = document.createElement("span");
+                        comma.innerText = ",&nbsp";
+                        section.appendChild(comma);
+                    }
                 }
             }
         }
     }
-};
-
-getProfessorInfoSB = async (profContainer, profArr, i, tempDiv, newElement, section) => {
-    // console.log(profArr[i]);
-    const prof = profs.find(
-        (prof) => prof.firstName + " " + prof.lastName === profArr[i]
-    );
-    // console.log(prof);
-    if (prof === undefined) {
-        return;
-    }
-    // console.log("parent length: ", profContainer.children.length);
-
-    // only one prof
-    if (profArr.length == 1) {
-        if (profContainer.children.length === 2) {
-            const popup = initPopup(prof, section);
-            profContainer.appendChild(popup);
-            section.style.cssText += "background-color: #D4E9B8;";
-            // profContainer.replaceChild(newElement, section);
-        }
-    }
-    // multiple profs
-    else {
-        console.log("length not 1: ", profArr.length);
-        tempDiv.appendChild(newElement);
-        // profContainer.replaceChild(tempDiv, section);
-    }
-    // else {
-    //     newElement.innerHTML = `${profArr[i]}<br>`;
-    //     tempDiv.appendChild(newElement);
-    //     profContainer.replaceChild(tempDiv, section);
-    // }
 };
 
 getProfessorRatings = async () => {
@@ -235,7 +199,7 @@ getProfessorRatings = async () => {
         },
     };
     fetch(
-        "https://api.github.com/repos/Polyratings/polyratings-data/contents/professor-list.json?ref=data",
+        "https://api.github.com/repos/Polyratings/Polyratings-data/contents/professor-list.json?ref=data",
         init
     )
         .then((response) => {
