@@ -1,5 +1,7 @@
 let profs = new Map();
 
+/* ---- student center ---- */
+
 addEvalSC = () => {
     const sectionArr = document.querySelectorAll('span[id*="MTG_INSTR$"]'); // array of sections
     sectionArr.forEach((section) => {
@@ -7,9 +9,54 @@ addEvalSC = () => {
         if (profArr != null) {
             let profContainer = section.parentNode.parentNode;
             profContainer.classList.add("parContainer");
-            getProfessorInfo(profContainer, profArr, section, "SC");
+            getProfInfo(profContainer, profArr, section, "SC", "all");
         }
     });
+};
+
+/* ---- schedule builder ---- */
+
+getSBProfs = (section, bwSize) => {
+    let profArr = findProfs(section.innerText);
+    if (profArr != null) {
+        let profContainer = section.parentNode;
+        profContainer.classList.add("parContainer");
+        getProfInfo(profContainer, profArr, section, "SB", bwSize);
+    }
+};
+
+// parse elements for smaller browser widths in SB
+smallerBW = (sectionInfoContainer) => {
+    if (sectionInfoContainer != undefined) {
+        for (i = 0; i < sectionInfoContainer.length; i++) {
+            let sectionInfo = sectionInfoContainer.item(i);
+            if (sectionInfo != undefined) {
+                let section = sectionInfo.getElementsByTagName("dd").item(0);
+                getSBProfs(section, "small");
+            }
+        }
+    }
+};
+
+// parse elements for larger browser widths in SB
+largerBW = (sectionInfoContainer) => {
+    console.log(sectionInfoContainer);
+    if (sectionInfoContainer != undefined) {
+        for (i = 0; i < sectionInfoContainer.length; i++) {
+            let sectionInfo = sectionInfoContainer[i].getElementsByClassName(
+                "cx-MuiTypography-root css-w00cnv cx-MuiTypography-body1"
+            );
+            console.log("sectionInfo: ", sectionInfo);
+            console.log("sectionInfo.length: ", sectionInfo.length);
+            if (sectionInfo != undefined) {
+                let section = sectionInfo.item(sectionInfo.length - 12);
+                console.log("section: ", section);
+                if (section != null) {
+                    getSBProfs(section, "large");
+                }
+            }
+        }
+    }
 };
 
 addEvalSB = () => {
@@ -22,37 +69,21 @@ addEvalSB = () => {
                     '[aria-label="Sections List"]'
                 )[0];
                 if (sectionsList != undefined) {
-                    let sectionInfoContainer = sectionsList.getElementsByClassName(
-                        "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item"
-                    );
-                    if (sectionInfoContainer != undefined) {
-                        for (i = 0; i < sectionInfoContainer.length; i++) {
-                            let sectionInfo = sectionInfoContainer.item(i);
-                            if (sectionInfo != undefined) {
-                                let section = sectionInfo
-                                    .getElementsByTagName("dd")
-                                    .item(0);
-                                let profArr = findProfs(section.innerText);
-                                if (profArr != null) {
-                                    let profContainer = section.parentNode;
-                                    profContainer.classList.add("parContainer");
-                                    getProfessorInfo(
-                                        profContainer,
-                                        profArr,
-                                        section,
-                                        "SB"
-                                    );
-                                }
-                            }
-                        }
-                    }
+                    sbwClasses =
+                        "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item";
+                    lbwClasses =
+                        "cx-MuiGrid-root cx-MuiGrid-container cx-MuiGrid-spacing-xs-1";
+                    smallerBW(sectionsList.getElementsByClassName(sbwClasses));
+                    largerBW(sectionsList.getElementsByClassName(lbwClasses));
                 }
             }
         }
     }
 };
 
-initPopup = (prof, section) => {
+/* ---- general ---- */
+
+initPopup = (prof, section, parContainer) => {
     // create popup
     let popup = document.createElement("div");
     popup.className = "hidden-popup";
@@ -103,7 +134,20 @@ initPopup = (prof, section) => {
     popup.appendChild(btn);
 
     // add event listener for popup
-    eventHandler = () => popup.classList.toggle("visible-popup");
+    eventHandler = () => {
+        popup.classList.toggle("visible-popup");
+        if (popup.classList.contains("visible-popup")) {
+            section.style.removeProperty("margin-top");
+            section.style.cssText +=
+                "align-items: center; flex-direction: column; margin-top:2px";
+            // parContainer.align = "center";
+        } else {
+            section.style.removeProperty("align-items");
+            section.style.removeProperty("flex-direction");
+            section.style.cssText += "margin-top:12px;";
+            // parContainer.align = "left";
+        }
+    };
     section.addEventListener("click", eventHandler);
     section.style.cssText += "cursor:pointer;";
 
@@ -119,7 +163,7 @@ findProfs = (name) => {
     }
 };
 
-getProfessorInfo = async (profContainer, profArr, section, platform) => {
+getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
     for (let i = 0; i < profArr.length; i++) {
         const prof = profs.find(
             (prof) => prof.firstName + " " + prof.lastName === profArr[i]
@@ -129,11 +173,21 @@ getProfessorInfo = async (profContainer, profArr, section, platform) => {
         if (profArr.length == 1) {
             if (prof !== undefined) {
                 if (platform == "SC" && profContainer.children.length === 1) {
-                    const popup = initPopup(prof, section);
+                    const popup = initPopup(prof, section, profContainer);
                     profContainer.appendChild(popup);
-                    section.style.cssText += "background-color: #D4E9B8;";
-                } else if (platform == "SB" && profContainer.children.length === 2) {
-                    section.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a>`;
+                    section.style.cssText +=
+                        "display:flex;max-width:fit-content;background-color: #D4E9B8;margin-top:10px";
+                    // cursor: pointer;background-color: rgb(212, 233, 184);display:flex;max-width:fit-content;margin-top:10px
+                } else if (platform == "SB") {
+                    if (profContainer.children.length === 2 && bwSize === "small") {
+                        section.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a>`;
+                    } else if (
+                        profContainer.children.length === 1 &&
+                        bwSize === "large"
+                    ) {
+                        // console.log(section);
+                        section.innerHTML = `<span><a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a><span>`;
+                    }
                 }
             }
         }
@@ -152,21 +206,21 @@ getProfessorInfo = async (profContainer, profArr, section, platform) => {
                     if (prof !== undefined) {
                         uniqueProf.style.cssText +=
                             "background-color: #D4E9B8; margin-bottom: 4px;";
-                        const popup = initPopup(prof, section);
+                        const popup = initPopup(prof, section, profContainer);
                         profContainer.appendChild(popup);
                     }
                 }
             } else if (platform == "SB") {
                 if (section.children.length < profArr.length * 2) {
                     if (prof !== undefined) {
-                        uniqueProf.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a>`;
+                        uniqueProf.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'>${profArr[i]}</a>`;
                     } else {
                         uniqueProf.innerHTML = `${profArr[i]}`;
                     }
                     section.appendChild(uniqueProf);
                     if (section.children.length != profArr.length * 2 - 1) {
                         let comma = document.createElement("span");
-                        comma.innerText = ",&nbsp";
+                        comma.innerText = ",\u00A0";
                         section.appendChild(comma);
                     }
                 }
