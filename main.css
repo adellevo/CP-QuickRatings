@@ -17,9 +17,15 @@ p {
     color: var(--green);
 }
 
+/* .par-container {
+    height: fit-content;
+} */
+
 /* The actual popup */
 .hidden-popup {
     visibility: hidden;
+    -webkit-animation: fadeOut 1s;
+    animation: fadeOut 1s;
     width: 136px;
     height: 0;
     overflow: hidden;
@@ -37,8 +43,8 @@ p {
 
 .visible-popup {
     visibility: visible;
-    -webkit-animation: fadeIn 1s;
-    animation: fadeIn 1s;
+    -webkit-animation: fadeIn 2s;
+    animation: fadeIn 2s;
     height: 160px !important;
 }
 

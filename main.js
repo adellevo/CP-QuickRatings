@@ -46,11 +46,16 @@ largerBW = (sectionInfoContainer) => {
             let sectionInfo = sectionInfoContainer[i].getElementsByClassName(
                 "cx-MuiTypography-root css-w00cnv cx-MuiTypography-body1"
             );
-            console.log("sectionInfo: ", sectionInfo);
-            console.log("sectionInfo.length: ", sectionInfo.length);
-            if (sectionInfo != undefined) {
-                let section = sectionInfo.item(sectionInfo.length - 12);
-                console.log("section: ", section);
+            let labels = sectionInfoContainer[i].getElementsByClassName(
+                " cx-MuiTypography-root cx-MuiTypography-body1 cx-MuiTypography-colorTextSecondary"
+            );
+            if (labels != undefined && sectionInfo != undefined) {
+                let labelArr = [];
+                for (let i = 0; i < labels.length; i++) {
+                    labelArr.push(labels[i].innerText);
+                }
+                const index = labelArr.findIndex((label) => label === "Instructor:");
+                let section = sectionInfo.item(index);
                 if (section != null) {
                     getSBProfs(section, "large");
                 }
@@ -129,27 +134,32 @@ initPopup = (prof, section, parContainer) => {
 
     // Polyratings link
     const btn = document.createElement("div");
-    btn.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> View on Polyratings </a>`;
+    const link = getProfLink(prof);
+    btn.innerHTML = `<a href='${link}' target='_blank'> View on Polyratings </a>`;
     btn.className = "btn";
     popup.appendChild(btn);
 
-    // add event listener for popup
-    eventHandler = () => {
-        popup.classList.toggle("visible-popup");
-        if (popup.classList.contains("visible-popup")) {
+    // handle popup actions
+    popupOpen = () => {
+        if (!popup.classList.contains("visible-popup")) {
+            popup.classList.toggle("visible-popup");
             section.style.removeProperty("margin-top");
             section.style.cssText +=
                 "align-items: center; flex-direction: column; margin-top:2px";
-            // parContainer.align = "center";
-        } else {
+        }
+    };
+    popupClose = () => {
+        if (popup.classList.contains("visible-popup")) {
+            popup.classList.toggle("visible-popup");
             section.style.removeProperty("align-items");
             section.style.removeProperty("flex-direction");
             section.style.cssText += "margin-top:12px;";
-            // parContainer.align = "left";
         }
     };
-    section.addEventListener("click", eventHandler);
-    section.style.cssText += "cursor:pointer;";
+
+    section.addEventListener("mouseenter", popupOpen);
+    parContainer.addEventListener("mouseleave", popupClose);
+    // section.style.cssText += "cursor:pointer;";
 
     return popup;
 };
@@ -162,6 +172,9 @@ findProfs = (name) => {
         return name.split(",").map((item) => item.trim());
     }
 };
+
+// returns link to professor's rating page
+getProfLink = (prof) => `https://Polyratings.dev/teacher/${prof.id}`;
 
 getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
     for (let i = 0; i < profArr.length; i++) {
@@ -177,16 +190,16 @@ getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
                     profContainer.appendChild(popup);
                     section.style.cssText +=
                         "display:flex;max-width:fit-content;background-color: #D4E9B8;margin-top:10px";
-                    // cursor: pointer;background-color: rgb(212, 233, 184);display:flex;max-width:fit-content;margin-top:10px
                 } else if (platform == "SB") {
+                    const link = getProfLink(prof);
                     if (profContainer.children.length === 2 && bwSize === "small") {
-                        section.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a>`;
+                        section.innerHTML = `<a href='${link}' target='_blank'> ${profArr[i]} </a>`;
                     } else if (
                         profContainer.children.length === 1 &&
                         bwSize === "large"
                     ) {
                         // console.log(section);
-                        section.innerHTML = `<span><a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'> ${profArr[i]} </a><span>`;
+                        section.innerHTML = `<span><a href='${link}' target='_blank'> ${profArr[i]} </a><span>`;
                     }
                 }
             }
@@ -213,7 +226,8 @@ getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
             } else if (platform == "SB") {
                 if (section.children.length < profArr.length * 2) {
                     if (prof !== undefined) {
-                        uniqueProf.innerHTML = `<a href='https://Polyratings.dev/teacher/${prof.id}' target='_blank'>${profArr[i]}</a>`;
+                        const link = getProfLink(prof);
+                        uniqueProf.innerHTML = `<a href='${link}' target='_blank'>${profArr[i]}</a>`;
                     } else {
                         uniqueProf.innerHTML = `${profArr[i]}`;
                     }
