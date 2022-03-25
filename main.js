@@ -40,7 +40,6 @@ smallerBW = (sectionInfoContainer) => {
 
 // parse elements for larger browser widths in SB
 largerBW = (sectionInfoContainer) => {
-    console.log(sectionInfoContainer);
     if (sectionInfoContainer != undefined) {
         for (i = 0; i < sectionInfoContainer.length; i++) {
             let sectionInfo = sectionInfoContainer[i].getElementsByClassName(
@@ -198,7 +197,6 @@ getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
                         profContainer.children.length === 1 &&
                         bwSize === "large"
                     ) {
-                        // console.log(section);
                         section.innerHTML = `<span><a href='${link}' target='_blank'> ${profArr[i]} </a><span>`;
                     }
                 }

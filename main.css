@@ -17,10 +17,6 @@ p {
     color: var(--green);
 }
 
-/* .par-container {
-    height: fit-content;
-} */
-
 /* The actual popup */
 .hidden-popup {
     visibility: hidden;
