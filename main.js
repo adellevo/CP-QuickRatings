@@ -268,7 +268,7 @@ getProfessorRatings = async () => {
 };
 
 setup = async () => {
-    // only creates global map of prorfessor names/ids once
+    // only creates global map of professor names/ids once
     if (profs.size === 0) {
         // console.log('getting professors');
         await getProfessorRatings();

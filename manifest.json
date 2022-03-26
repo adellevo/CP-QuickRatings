@@ -1,6 +1,6 @@
 {
     "name": "Polyratings",
-    "version": "2",
+    "version": "2.0",
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
@@ -20,6 +20,8 @@
             "run_at": "document_end"
         }
     ],
-    "host_permissions": ["https://www.polyratings.com/*"],
+    "host_permissions": [
+        "https://api.github.com/repos/Polyratings/Polyratings-data/contents/professor-list.json?ref=data"
+    ],
     "manifest_version": 3
 }
