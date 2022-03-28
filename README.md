@@ -8,17 +8,17 @@ To activate the extension, [install](https://chrome.google.com/webstore/detail/P
 
 You will see that some professors' names are highlighted in green, which indicates that they have existing Polyratings data. Hovering over any highlighted name will trigger a popup that displays an overview of the corresponding professor's ratings, as well as a button to visit that professor's Polyratings page, where you can read full reviews.
 
-<img src="https://github.com/adellevo/polyratings/blob/schedule-builder-integration/images/sc.png" width="600">
+<img src="https://github.com/adellevo/polyratings/blob/main/images/sc.png" width="600">
 
 #### If you're viewing classes on Schedule Builder...
 
 You will see that some professor's names are clickable — any professors with existing Polyratings data will have their name hyperlinked to their Polyratings page. These links show up in different places, depending on the size of your browser width. 
 
 > Larger browser widths: need to toggle section dropdown to view hyperlinks after clicking "Select Sections"
-<img src="https://github.com/adellevo/polyratings/blob/schedule-builder-integration/images/lbw-sb.png" width="600">
+<img src="https://github.com/adellevo/polyratings/blob/main/images/lbw-sb.png" width="600">
 
 > Smaller browser widths: can view hyperlinks directly after clicking "Select Sections"
-<img src="https://github.com/adellevo/polyratings/blob/schedule-builder-integration/images/sbw-sb.png" width="600"> 
+<img src="https://github.com/adellevo/polyratings/blob/main/images/sbw-sb.png" width="600"> 
 
 ---
 
