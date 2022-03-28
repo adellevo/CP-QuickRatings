@@ -1,8 +1,27 @@
-# PolyRatings Chrome Extension
-<mark>*We are not affiliated with the official PolyRatings site.*</mark>
+# Polyratings Chrome Extension (2.0)
 
-[Get the extension here](https://chrome.google.com/webstore/detail/polyratings/pliinobghndmnnjenolmokefjacnmdpo?hl=en&authuser=1)
+### How it works
 
-**How it Works:** Open up Student Center and either click "Search for Classes" or "Enroll" to activate the extension. While looking through classes, hover over any professor highlighted in green to bring up a popup that displays their rating data pulled straight from PolyRatings. Click the “View on PolyRatings” button to go directly to their PolyRatings page, where you can read full reviews. Professors without a PolyRatings page will not be highlighted in green. If a class is taught by multiple professors, it may take a few seconds for the popups to fully initialize. 
+To activate the extension, [install](https://chrome.google.com/webstore/detail/Polyratings/pliinobghndmnnjenolmokefjacnmdpo?hl=en&authuser=1) it and log into Student Center.
 
-**Other Notes:** This extension is in active development. If you encounter any issues, please let us know by emailing us directly at polyratings.ce@gmail.com or submitting feedback through this [Google Form](https://forms.gle/BE3mTCXdY2LNYvLB6).
+#### If you're viewing classes through "Search for Classes" or "Enroll"...
+
+You will see that some professors' names are highlighted in green, which indicates that they have existing Polyratings data. Hovering over any highlighted name will trigger a popup that displays an overview of the corresponding professor's ratings, as well as a button to visit that professor's Polyratings page, where you can read full reviews.
+
+<img src="https://github.com/adellevo/polyratings/blob/schedule-builder-integration/images/sc.png" width="600">
+
+#### If you're viewing classes on Schedule Builder...
+
+You will see that some professor's names are clickable — any professors with existing Polyratings data will have their name hyperlinked to their Polyratings page. These links show up in different places, depending on the size of your browser width. 
+
+> Larger browser widths: need to toggle section dropdown to view hyperlinks after clicking "Select Sections"
+<img src="https://github.com/adellevo/polyratings/blob/schedule-builder-integration/images/lbw-sb.png" width="600">
+
+> Smaller browser widths: can view hyperlinks directly after clicking "Select Sections"
+<img src="https://github.com/adellevo/polyratings/blob/schedule-builder-integration/images/sbw-sb.png" width="600"> 
+
+---
+
+### Other notes
+
+This extension is in active development. If you encounter any issues, please let us know by emailing us at polyratings.ce@gmail.com or submitting feedback through this [Google Form](https://forms.gle/BE3mTCXdY2LNYvLB6).
