@@ -173,7 +173,7 @@ findProfs = (name) => {
 };
 
 // returns link to professor's rating page
-getProfLink = (prof) => `https://Polyratings.dev/teacher/${prof.id}`;
+getProfLink = (prof) => `https://polyratings.com/teacher/${prof.id}`;
 
 getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
     for (let i = 0; i < profArr.length; i++) {
