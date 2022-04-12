@@ -1,71 +1,87 @@
-let profs = new Map();
+import { Teacher } from "@polyratings/client";
+let profs: Teacher[] = [];
 
 /* ---- student center ---- */
 
-addEvalSC = () => {
-    const sectionArr = document.querySelectorAll('span[id*="MTG_INSTR$"]'); // array of sections
+const addEvalSC = () => {
+    const sectionArr = document.querySelectorAll<HTMLElement>('span[id*="MTG_INSTR$"]'); // array of sections
     sectionArr.forEach((section) => {
-        let profArr = findProfs(section.innerText); // array of profs for that section
-        if (profArr != null) {
-            let profContainer = section.parentNode.parentNode;
-            profContainer.classList.add("parContainer");
-            getProfInfo(profContainer, profArr, section, "SC", "all");
+        let profArr: string[] | null = findProfs(section.innerText); // array of profs for that section
+        if (profArr) {
+            if (section.parentNode) {
+                let profContainer: HTMLElement | null | undefined =
+                    section.parentElement?.parentElement;
+                if (profContainer) {
+                    profContainer.classList.add("parContainer");
+                    getProfInfo(profContainer, profArr, section, "SC", "all");
+                }
+            }
         }
     });
 };
 
 /* ---- schedule builder ---- */
 
-getSBProfs = (section, bwSize) => {
+const getSBProfs = (section: HTMLElement, bwSize: string) => {
     let profArr = findProfs(section.innerText);
-    if (profArr != null) {
-        let profContainer = section.parentNode;
-        profContainer.classList.add("parContainer");
-        getProfInfo(profContainer, profArr, section, "SB", bwSize);
+    if (profArr) {
+        let profContainer = section.parentElement;
+        if (profContainer) {
+            profContainer.classList.add("parContainer");
+            getProfInfo(profContainer, profArr, section, "SB", bwSize);
+        }
     }
 };
 
 // parse elements for smaller browser widths in SB
-smallerBW = (sectionInfoContainer) => {
-    if (sectionInfoContainer != undefined) {
-        for (i = 0; i < sectionInfoContainer.length; i++) {
+const smallerBW = (sectionInfoContainer: HTMLCollection | null) => {
+    if (sectionInfoContainer) {
+        for (let i = 0; i < sectionInfoContainer.length; i++) {
             let sectionInfo = sectionInfoContainer.item(i);
             if (sectionInfo != undefined) {
-                let section = sectionInfo.getElementsByTagName("dd").item(0);
-                getSBProfs(section, "small");
+                let section: HTMLElement | null = sectionInfo
+                    .getElementsByTagName("dd")
+                    .item(0);
+                if (section) {
+                    getSBProfs(section, "small");
+                }
             }
         }
     }
 };
 
 // parse elements for larger browser widths in SB
-largerBW = (sectionInfoContainer) => {
+const largerBW = (sectionInfoContainer: HTMLCollection) => {
     if (sectionInfoContainer != undefined) {
-        for (i = 0; i < sectionInfoContainer.length; i++) {
-            let sectionInfo = sectionInfoContainer[i].getElementsByClassName(
+        for (let i = 0; i < sectionInfoContainer.length; i++) {
+            let sectionInfo: HTMLCollection = sectionInfoContainer[
+                i
+            ].getElementsByClassName(
                 "cx-MuiTypography-root css-w00cnv cx-MuiTypography-body1"
             );
-            let labels = sectionInfoContainer[i].getElementsByClassName(
+            let labels: HTMLCollection = sectionInfoContainer[i].getElementsByClassName(
                 " cx-MuiTypography-root cx-MuiTypography-body1 cx-MuiTypography-colorTextSecondary"
             );
             if (labels != undefined && sectionInfo != undefined) {
-                let labelArr = [];
+                let labelArr: string[] = [];
                 for (let i = 0; i < labels.length; i++) {
-                    labelArr.push(labels[i].innerText);
+                    labelArr.push((labels[i] as HTMLElement).innerText);
                 }
-                const index = labelArr.findIndex((label) => label === "Instructor:");
-                let section = sectionInfo.item(index);
-                if (section != null) {
-                    getSBProfs(section, "large");
+                const index: number = labelArr.findIndex(
+                    (label) => label === "Instructor:"
+                );
+                let section: Element | null = sectionInfo.item(index);
+                if (section) {
+                    getSBProfs(section as HTMLElement, "large");
                 }
             }
         }
     }
 };
 
-addEvalSB = () => {
-    let iframe = document.getElementById("ptifrmtgtframe");
-    if (iframe != undefined) {
+const addEvalSB = () => {
+    let iframe = document.getElementById("ptifrmtgtframe") as HTMLIFrameElement;
+    if (iframe) {
         if (iframe.contentDocument != undefined) {
             let iframeBody = iframe.contentDocument.body;
             if (iframeBody != undefined) {
@@ -73,9 +89,9 @@ addEvalSB = () => {
                     '[aria-label="Sections List"]'
                 )[0];
                 if (sectionsList != undefined) {
-                    sbwClasses =
+                    const sbwClasses =
                         "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item";
-                    lbwClasses =
+                    const lbwClasses =
                         "cx-MuiGrid-root cx-MuiGrid-container cx-MuiGrid-spacing-xs-1";
                     smallerBW(sectionsList.getElementsByClassName(sbwClasses));
                     largerBW(sectionsList.getElementsByClassName(lbwClasses));
@@ -87,7 +103,7 @@ addEvalSB = () => {
 
 /* ---- general ---- */
 
-initPopup = (prof, section, parContainer) => {
+const initPopup = (prof: Teacher, section: HTMLElement, parContainer: Element) => {
     // create popup
     let popup = document.createElement("div");
     popup.className = "hidden-popup";
@@ -100,21 +116,9 @@ initPopup = (prof, section, parContainer) => {
     popup.appendChild(titleDiv);
 
     // make ratings have consistent formatting
-    let displayOR = prof.overallRating.toString();
-    let displayMC = prof.materialClear.toString();
-    let displaySD = prof.studentDifficulties.toString();
-    orPadLen = 4 - displayOR.length;
-    if (orPadLen !== 0) {
-        orPadLen === 3 ? (displayOR += ".00") : (displayOR += "0" * orPadLen);
-    }
-    mcPadLen = 4 - displayMC.length;
-    if (mcPadLen !== 0) {
-        mcPadLen === 3 ? (displayMC += ".00") : (displayMC += "0" * mcPadLen);
-    }
-    sdPadLen = 4 - displaySD.length;
-    if (sdPadLen !== 0) {
-        sdPadLen === 3 ? (displaySD += ".00") : (displaySD += "0" * sdPadLen);
-    }
+    let displayOR: string = (Math.round(prof.overallRating * 100) / 100).toFixed(2);
+    let displayMC: string = (Math.round(prof.materialClear * 100) / 100).toFixed(2);
+    let displaySD: string = (Math.round(prof.studentDifficulties * 100) / 100).toFixed(2);
 
     // create table rows
     const overview = [
@@ -139,7 +143,7 @@ initPopup = (prof, section, parContainer) => {
     popup.appendChild(btn);
 
     // handle popup actions
-    popupOpen = () => {
+    const popupOpen = () => {
         if (!popup.classList.contains("visible-popup")) {
             popup.classList.toggle("visible-popup");
             section.style.removeProperty("margin-top");
@@ -147,7 +151,7 @@ initPopup = (prof, section, parContainer) => {
                 "align-items: center; flex-direction: column; margin-top:2px";
         }
     };
-    popupClose = () => {
+    const popupClose = () => {
         if (popup.classList.contains("visible-popup")) {
             popup.classList.toggle("visible-popup");
             section.style.removeProperty("align-items");
@@ -164,18 +168,24 @@ initPopup = (prof, section, parContainer) => {
 };
 
 // returns array of professors
-findProfs = (name) => {
-    if (name == "To be Announced" || name == "Staff") {
+const findProfs = (name: string): string[] | null => {
+    if (name === "To be Announced" || name === "Staff") {
         return null;
-    } else {
-        return name.split(",").map((item) => item.trim());
     }
+    return name.split(",").map((item) => item.trim());
 };
 
 // returns link to professor's rating page
-getProfLink = (prof) => `https://polyratings.com/teacher/${prof.id}`;
+const getProfLink = (prof: Teacher): string =>
+    `https://polyratings.dev/teacher/${prof.id}`;
 
-getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
+const getProfInfo = async (
+    profContainer: HTMLElement,
+    profArr: string[],
+    section: HTMLElement,
+    platform: string,
+    bwSize: string
+) => {
     for (let i = 0; i < profArr.length; i++) {
         const prof = profs.find(
             (prof) => prof.firstName + " " + prof.lastName === profArr[i]
@@ -185,12 +195,12 @@ getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
         if (profArr.length == 1) {
             if (prof !== undefined) {
                 if (platform == "SC" && profContainer.children.length === 1) {
-                    const popup = initPopup(prof, section, profContainer);
+                    const popup: HTMLDivElement = initPopup(prof, section, profContainer);
                     profContainer.appendChild(popup);
                     section.style.cssText +=
                         "display:flex;max-width:fit-content;background-color: #D4E9B8;margin-top:10px";
                 } else if (platform == "SB") {
-                    const link = getProfLink(prof);
+                    const link: string = getProfLink(prof);
                     if (profContainer.children.length === 2 && bwSize === "small") {
                         section.innerHTML = `<a href='${link}' target='_blank'> ${profArr[i]} </a>`;
                     } else if (
@@ -241,7 +251,7 @@ getProfInfo = async (profContainer, profArr, section, platform, bwSize) => {
     }
 };
 
-getProfessorRatings = async () => {
+const getProfessorRatings = async () => {
     const init = {
         method: "GET",
         headers: {
@@ -261,20 +271,21 @@ getProfessorRatings = async () => {
         })
         .then((response) => {
             profs = response;
+            console.log(profs);
         })
         .catch((err) => {
             console.log("Fetch error: " + err);
         });
 };
 
-setup = async () => {
+const setup = async () => {
     // only creates global map of professor names/ids once
-    if (profs.size === 0) {
+    if (profs.length === 0) {
         // console.log('getting professors');
         await getProfessorRatings();
     }
-    addEvalSC(document);
-    addEvalSB(document);
+    addEvalSC();
+    addEvalSB();
     setTimeout(setup, 1000);
 };
 

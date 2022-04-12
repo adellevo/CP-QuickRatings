@@ -1,5 +1,5 @@
 {
-    "name": "Polyratings",
+    "name": "Polyratings Test",
     "version": "2.1",
     "icons": {
         "16": "icon16.png",
@@ -12,7 +12,8 @@
             "matches": [
                 "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?*",
                 "https://cmsweb.pscs.calpoly.edu/psc/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL?*",
-                "https://cmsweb.pscs.calpoly.edu/psp/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?*"
+                "https://cmsweb.pscs.calpoly.edu/psp/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?*",
+                "https://cmsweb.pscs.calpoly.edu/psp/CSLOPRD/EMPLOYEE/SA/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?ACAD_CAREER=UGRD&EMPLID=026536672&INSTITUTION=SLCMP&STRM=2224&PAGE=SSR_SSENRL_CART&IsFolder=false"
             ],
             "all_frames": true,
             "css": ["main.css"],
