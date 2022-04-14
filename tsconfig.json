@@ -1,18 +1,18 @@
 {
-    "compilerOptions": {
-        "target": "es3",
-        "watch": true,
-        "lib": ["dom", "es2017"],
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true,
-        "sourceMap": true,
-        "rootDir": "src",
-        "outDir": "dist/js",
-        "noEmitOnError": true,
-        "typeRoots": ["node_modules/@types"]
-    },
-    "files": ["./src/main.ts"]
+  "compilerOptions": {
+    "target": "ES2017",
+    "watch": true,
+    "lib": ["dom", "es2017"],
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "dist/js",
+    "noEmitOnError": true,
+    "typeRoots": ["node_modules/@types"]
+  },
+  "files": ["./src/main.ts"]
 }
