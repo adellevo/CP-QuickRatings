@@ -1,12 +1,12 @@
-import { Teacher } from "@polyratings/client";
-let profs: Teacher[] = [];
+import type { Teacher } from "@polyratings/client";
+
+const POPUP_PARENT_CONTAINER_CLASS = "polyratings-popup-container";
 
 /* ---- student center ---- */
-
 const addEvalSC = () => {
   const sectionArr = document.querySelectorAll<HTMLElement>('span[id*="MTG_INSTR$"]'); // array of sections
   sectionArr.forEach((section) => {
-    let profArr: string[] | null = findProfs(section.innerText); // array of profs for that section
+    let profArr: string[] | null = findProfessorName(section.innerText); // array of profs for that section
     if (profArr) {
       if (section.parentNode) {
         let profContainer: HTMLElement | null | undefined =
@@ -21,9 +21,8 @@ const addEvalSC = () => {
 };
 
 /* ---- schedule builder ---- */
-
 const getSBProfs = (section: HTMLElement, bwSize: string) => {
-  let profArr = findProfs(section.innerText);
+  let profArr = findProfessorName(section.innerText);
   if (profArr) {
     let profContainer = section.parentElement;
     if (profContainer) {
@@ -95,76 +94,54 @@ const addEvalSB = () => {
 
 /* ---- general ---- */
 
-const initPopup = (prof: Teacher, section: HTMLElement, parContainer: Element) => {
+const initPopup = (prof: Teacher): HTMLElement => {
   // create popup
-  let popup = document.createElement("div");
-  popup.className = "hidden-popup";
+  const tempararyDiv = document.createElement("div");
 
-  // popup header
-  const titleDiv = document.createElement("div");
-  prof.numEvals == 1
-    ? (titleDiv.innerHTML = `<h1>${prof.firstName} ${prof.lastName}</h1><p>Based on ${prof.numEvals} rating...</p>`)
-    : (titleDiv.innerHTML = `<h1>${prof.firstName} ${prof.lastName}</h1><p>Based on ${prof.numEvals} ratings...</p>`);
-  popup.appendChild(titleDiv);
+  const popupHtml = `
+  <div class="polyratings-popup">
+  <div>
+  <h1>${prof.firstName} ${prof.lastName}</h1>
+  <p>Based on ${prof.numEvals} ${prof.numEvals == 1 ? "rating" : "ratings"}..</p>
+  </div>
+  <div class="polyratings-popup-row">
+      <div>
+      Overall:
+      </div>
+      <div>
+      ${prof.overallRating.toFixed(2)} / 4.00
+      </div>
+  </div>
+  <div class="polyratings-popup-row">
+      <div>
+      Clarity:
+      </div>
+      <div>
+      ${prof.materialClear.toFixed(2)} / 4.00
+      </div>
+  </div>
+  <div class="polyratings-popup-row">
+      <div>
+      Helpfulness:
+      </div>
+      <div>
+      ${prof.studentDifficulties.toFixed(2)} / 4.00
+      </div>
+  </div>
+  <div class="polyratings-popup-btn">
+  <a
+      href="https://Polyratings.dev/professor/${prof.id}"
+      target="_blank"
+  >
+      View on Polyratings
+  </a>
+  </div>
+</div>
+`;
 
-  // make ratings have consistent formatting
-  let displayOR: string = (Math.round(prof.overallRating * 100) / 100).toFixed(2);
-  let displayMC: string = (Math.round(prof.materialClear * 100) / 100).toFixed(2);
-  let displaySD: string = (Math.round(prof.studentDifficulties * 100) / 100).toFixed(2);
+  tempararyDiv.innerHTML = popupHtml;
 
-  // create table rows
-  const overview = [
-    `Overall:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${displayOR} / 4.00`,
-    `Clarity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${displayMC} / 4.00`,
-    `Helpfulness:&nbsp;&nbsp;&nbsp;&nbsp;${displaySD} / 4.00`,
-  ];
-  overview.forEach((subrating, i) => {
-    let subDiv = document.createElement("div");
-    subDiv.innerHTML = subrating;
-    popup.appendChild(subDiv);
-    i % 2 == 0
-      ? (subDiv.className = "subrating-even")
-      : (subDiv.className = "subrating-odd");
-  });
-
-  // Polyratings link
-  const btn = document.createElement("div");
-  const link = getProfLink(prof);
-  btn.innerHTML = `<a href='${link}' target='_blank'> View on Polyratings </a>`;
-  btn.className = "btn";
-  popup.appendChild(btn);
-
-  // handle popup actions
-  const popupOpen = () => {
-    if (!popup.classList.contains("visible-popup")) {
-      popup.classList.toggle("visible-popup");
-      section.style.removeProperty("margin-top");
-      section.style.cssText +=
-        "align-items: center; flex-direction: column; margin-top:2px";
-    }
-  };
-  const popupClose = () => {
-    if (popup.classList.contains("visible-popup")) {
-      popup.classList.toggle("visible-popup");
-      section.style.removeProperty("align-items");
-      section.style.removeProperty("flex-direction");
-      section.style.cssText += "margin-top:12px;";
-    }
-  };
-
-  section.addEventListener("mouseenter", popupOpen);
-  parContainer.addEventListener("mouseleave", popupClose);
-  // section.style.cssText += "cursor:pointer;";
-
-  return popup;
-};
-
-// returns array of professors
-const findProfs = (name: string): string[] | null => {
-  if (name === "To be Announced" || name === "Staff") {
-    return null;
-  }
-  return name.split(",").map((item) => item.trim());
+  return tempararyDiv.children[0] as HTMLElement;
 };
 
 // returns link to professor's rating page
@@ -178,25 +155,24 @@ const getProfInfo = async (
   platform: string,
   bwSize: string
 ) => {
-  for (let i = 0; i < profArr.length; i++) {
-    const prof = profs.find(
-      (prof) => prof.firstName + " " + prof.lastName === profArr[i]
-    );
+  for (let [i, professorName] of profArr.entries()) {
+    const [firstName, lastName] = professorName.split(" ");
+    const prof = await findProfessor(firstName, lastName);
 
     // only one prof
     if (profArr.length == 1) {
       if (prof !== undefined) {
         if (platform == "SC" && profContainer.children.length === 1) {
-          const popup: HTMLDivElement = initPopup(prof, section, profContainer);
+          const popup = initPopup(prof, section, profContainer);
           profContainer.appendChild(popup);
           section.style.cssText +=
             "display:flex;max-width:fit-content;background-color: #D4E9B8;margin-top:10px";
         } else if (platform == "SB") {
           const link: string = getProfLink(prof);
           if (profContainer.children.length === 2 && bwSize === "small") {
-            section.innerHTML = `<a href='${link}' target='_blank'> ${profArr[i]} </a>`;
+            section.innerHTML = `<a href='${link}' target='_blank'> ${professorName} </a>`;
           } else if (profContainer.children.length === 1 && bwSize === "large") {
-            section.innerHTML = `<span><a href='${link}' target='_blank'> ${profArr[i]} </a><span>`;
+            section.innerHTML = `<span><a href='${link}' target='_blank'> ${professorName} </a><span>`;
           }
         }
       }
@@ -209,7 +185,7 @@ const getProfInfo = async (
 
       if (platform == "SC") {
         if (section.children.length < profArr.length) {
-          uniqueProf.innerHTML = `${profArr[i]}<br>`;
+          uniqueProf.innerHTML = `${professorName}<br>`;
           section.appendChild(uniqueProf);
 
           // append popup to container
@@ -223,9 +199,9 @@ const getProfInfo = async (
         if (section.children.length < profArr.length * 2) {
           if (prof !== undefined) {
             const link = getProfLink(prof);
-            uniqueProf.innerHTML = `<a href='${link}' target='_blank'>${profArr[i]}</a>`;
+            uniqueProf.innerHTML = `<a href='${link}' target='_blank'>${professorName}</a>`;
           } else {
-            uniqueProf.innerHTML = `${profArr[i]}`;
+            uniqueProf.innerHTML = `${professorName}`;
           }
           section.appendChild(uniqueProf);
           if (section.children.length != profArr.length * 2 - 1) {
@@ -239,42 +215,54 @@ const getProfInfo = async (
   }
 };
 
-const getProfessorRatings = async () => {
-  const init = {
-    method: "GET",
-    headers: {
-      accept: "application/vnd.github.v3.raw",
-    },
-  };
-  fetch(
-    "https://api.github.com/repos/Polyratings/Polyratings-data/contents/professor-list.json?ref=data",
-    init
-  )
-    .then((response) => {
-      if (response.status != 200) {
-        console.log("error, status code " + response.status);
-        return "error";
-      }
-      return response.json();
-    })
-    .then((response) => {
-      profs = response;
-      console.log(profs);
-    })
-    .catch((err) => {
-      console.log("Fetch error: " + err);
-    });
-};
-
-const setup = async () => {
-  // only creates global map of professor names/ids once
-  if (profs.length === 0) {
-    // console.log('getting professors');
-    await getProfessorRatings();
+/**
+ * returns array of professors
+ */
+const findProfessorName = (name: string): string[] | null => {
+  if (name === "To be Announced" || name === "Staff") {
+    return null;
   }
-  addEvalSC();
-  addEvalSB();
-  setTimeout(setup, 1000);
+  return name.split(",").map((item) => item.trim());
 };
 
-setup();
+const findProfessor = async (firstName: string, lastName: string) => {
+  const allProfessors = await getProfessorRatings();
+  return allProfessors.find(
+    (prof) => prof.firstName === firstName && prof.lastName === lastName
+  );
+};
+
+let profs: Teacher[] = [];
+const getProfessorRatings = async () => {
+  if (profs.length) {
+    return [...profs];
+  }
+
+  const githubRes = await fetch(
+    "https://api.github.com/repos/Polyratings/Polyratings-data/contents/professor-list.json?ref=data",
+    {
+      headers: {
+        accept: "application/vnd.github.v3.raw",
+      },
+    }
+  );
+  if (githubRes.status != 200) {
+    console.log("error, status code " + githubRes.status);
+    return [];
+  }
+
+  profs = await githubRes.json();
+  return [...profs];
+};
+
+const main = async () => {
+  while (true) {
+    addEvalSC();
+    addEvalSB();
+
+    // Sleep for 1 second
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+};
+
+main();
