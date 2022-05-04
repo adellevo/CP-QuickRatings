@@ -33,14 +33,20 @@
   visibility: visible;
   animation: fadeIn 0.5s;
   height: auto !important;
+  margin-left: 100px;
+  /* 
+  top: -10px;
+  right: -100px; */
 }
 
 .polyratings-popup-container {
   position: relative;
   overflow: visible !important;
-  --red: 0;
+  margin-right: 10px;
+  /* margin-bottom: -10px; */
+  /* --red: 0;
   --green: 0;
-  background-color: rgba(var(--red), var(--green), 0, 0.7) !important;
+  background-color: rgba(var(--red), var(--green), 0, 0.7) !important; */
 }
 
 .polyratings-popup h1 {
@@ -73,6 +79,10 @@
   to {
     opacity: 0;
   }
+}
+
+.polyratings-popup > div.polyratings-popup-row:nth-of-type(even) {
+  background-color: #f2f2f2;
 }
 
 .polyratings-popup > div.polyratings-popup-row:nth-of-type(even) {

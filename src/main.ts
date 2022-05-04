@@ -9,8 +9,7 @@ const addEvalSC = () => {
     let profArr: string[] | null = findProfessorName(section.innerText); // array of profs for that section
     if (profArr) {
       if (section.parentNode) {
-        let profContainer: HTMLElement | null | undefined =
-          section.parentElement?.parentElement;
+        let profContainer: HTMLElement | null | undefined = section.parentElement?.parentElement;
         if (profContainer) {
           profContainer.classList.add("parContainer");
           getProfInfo(profContainer, profArr, section, "SC", "all");
@@ -80,10 +79,8 @@ const addEvalSB = () => {
       if (iframeBody != undefined) {
         let sectionsList = iframeBody.querySelectorAll('[aria-label="Sections List"]')[0];
         if (sectionsList != undefined) {
-          const sbwClasses =
-            "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item";
-          const lbwClasses =
-            "cx-MuiGrid-root cx-MuiGrid-container cx-MuiGrid-spacing-xs-1";
+          const sbwClasses = "cx-MuiGrid-root css-11nzenr  cx-MuiGrid-container cx-MuiGrid-item";
+          const lbwClasses = "cx-MuiGrid-root cx-MuiGrid-container cx-MuiGrid-spacing-xs-1";
           smallerBW(sectionsList.getElementsByClassName(sbwClasses));
           largerBW(sectionsList.getElementsByClassName(lbwClasses));
         }
@@ -119,7 +116,7 @@ const initPopup = (prof: Teacher): HTMLElement => {
       <div>
       ${prof.materialClear.toFixed(2)} / 4.00
       </div>
-  </div>
+  </div> 
   <div class="polyratings-popup-row">
       <div>
       Helpfulness:
@@ -145,8 +142,7 @@ const initPopup = (prof: Teacher): HTMLElement => {
 };
 
 // returns link to professor's rating page
-const getProfLink = (prof: Teacher): string =>
-  `https://polyratings.dev/teacher/${prof.id}`;
+const getProfLink = (prof: Teacher): string => `https://polyratings.dev/teacher/${prof.id}`;
 
 const getProfInfo = async (
   profContainer: HTMLElement,
@@ -156,15 +152,17 @@ const getProfInfo = async (
   bwSize: string
 ) => {
   for (let [i, professorName] of profArr.entries()) {
-    const [firstName, lastName] = professorName.split(" ");
+    // const [firstName, lastName] = professorName.split(" ");
+    const [firstName, lastName] = professorName.split(/(?<=^\S+)\s/);
     const prof = await findProfessor(firstName, lastName);
 
     // only one prof
     if (profArr.length == 1) {
       if (prof !== undefined) {
         if (platform == "SC" && profContainer.children.length === 1) {
-          const popup = initPopup(prof, section, profContainer);
+          const popup = initPopup(prof);
           profContainer.appendChild(popup);
+          profContainer.classList.add(POPUP_PARENT_CONTAINER_CLASS);
           section.style.cssText +=
             "display:flex;max-width:fit-content;background-color: #D4E9B8;margin-top:10px";
         } else if (platform == "SB") {
@@ -191,7 +189,7 @@ const getProfInfo = async (
           // append popup to container
           if (prof !== undefined) {
             uniqueProf.style.cssText += "background-color: #D4E9B8; margin-bottom: 4px;";
-            const popup = initPopup(prof, section, profContainer);
+            const popup = initPopup(prof);
             profContainer.appendChild(popup);
           }
         }
@@ -227,9 +225,7 @@ const findProfessorName = (name: string): string[] | null => {
 
 const findProfessor = async (firstName: string, lastName: string) => {
   const allProfessors = await getProfessorRatings();
-  return allProfessors.find(
-    (prof) => prof.firstName === firstName && prof.lastName === lastName
-  );
+  return allProfessors.find((prof) => prof.firstName === firstName && prof.lastName === lastName);
 };
 
 let profs: Teacher[] = [];
