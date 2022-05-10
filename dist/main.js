@@ -71,19 +71,49 @@ var getProfessorRatings = async () => {
 
 // src/scheduleBuilder.ts
 var scheduleBuilder = () => {
-  const smallerTargets = document.querySelectorAll(".cx-MuiGrid-root.css-11nzenr.cx-MuiGrid-container.cx-MuiGrid-item dl:first-child > dd");
-  const largerTargetsUnexpanded = document.querySelectorAll(".cx-MuiButtonBase-root.cx-MuiExpansionPanelSummary-root > div:first-child > div:first-child > .cx-MuiGrid-container > div > div:first-child");
-  const largerTargetsExpanded = document.querySelectorAll(".cx-MuiCollapse-container .cx-MuiGrid-root:nth-child(2) > div > div:nth-child(3) > p");
-  if (largerTargetsUnexpanded) {
-    const targets = [...Array.from(largerTargetsUnexpanded)];
-    handleLargerTargetsUnexpanded(targets);
+  const SmallTargets = document.querySelectorAll(".cx-MuiGrid-root.css-11nzenr.cx-MuiGrid-container.cx-MuiGrid-item dl:first-child > dd");
+  const LargeUnexpandedTargets = document.querySelectorAll(".cx-MuiButtonBase-root.cx-MuiExpansionPanelSummary-root > div:first-child > div:first-child > .cx-MuiGrid-container > div > div:first-child");
+  const LargeExpandedTargets = document.querySelectorAll(".cx-MuiCollapse-container .cx-MuiGrid-root:nth-child(2) > div > div:nth-child(3) > p");
+  if (SmallTargets) {
+    handleSmallTargets([...Array.from(SmallTargets)]);
   }
-  if (largerTargetsExpanded) {
-    const targets = [...Array.from(largerTargetsExpanded)];
-    handleLargerTargetsExpanded(targets);
+  if (LargeUnexpandedTargets) {
+    handleLargeUnexpandedTargets([...Array.from(LargeUnexpandedTargets)]);
+  }
+  if (LargeExpandedTargets) {
+    handleLargeExpandedTargets([...Array.from(LargeExpandedTargets)]);
   }
 };
-var handleLargerTargetsUnexpanded = (targets) => {
+var handleSmallTargets = (targets) => {
+  targets.forEach(async (section) => {
+    var _a;
+    console.log(section.innerText);
+    const professorList = [
+      ...new Set(((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
+    ];
+    const validProfessors = professorList.map(async (professorName) => await findProfessor(professorName != null ? professorName : "") != void 0);
+    const sectionChildren = [...Array.from(section.children)];
+    const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
+    if (popupsCreated == validProfessors.length) {
+      section.innerText = "";
+      return;
+    }
+    professorList.forEach(async (professorName) => {
+      const professor = await findProfessor(professorName != null ? professorName : "");
+      let uniqueProfessorDiv = document.createElement("div");
+      uniqueProfessorDiv.innerText = professorName;
+      if (section.children.length < validProfessors.length) {
+        section.appendChild(uniqueProfessorDiv);
+        if (professor) {
+          const popup = initPopup(professor);
+          uniqueProfessorDiv.appendChild(popup);
+          uniqueProfessorDiv.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+        }
+      }
+    });
+  });
+};
+var handleLargeUnexpandedTargets = (targets) => {
   targets.forEach(async (section) => {
     var _a;
     const professorList = ((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim());
@@ -96,7 +126,7 @@ var handleLargerTargetsUnexpanded = (targets) => {
     });
   });
 };
-var handleLargerTargetsExpanded = (targets) => {
+var handleLargeExpandedTargets = (targets) => {
   targets.forEach(async (section) => {
     var _a;
     const professorList = ((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim());
@@ -126,16 +156,53 @@ function studentCenter() {
   const sectionArr = document.querySelectorAll('span[id*="MTG_INSTR$"]');
   sectionArr.forEach(async (section) => {
     var _a;
-    const professor = await findProfessor((_a = section.textContent) != null ? _a : "");
-    const profContainer = section.parentNode.parentNode;
-    if (!professor || profContainer.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
-      return;
+    const professorList = [
+      ...new Set(((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
+    ];
+    if (professorList.length == 1) {
+      oneProfessor(section);
+    } else {
+      multipleProfessors(section, professorList);
     }
-    const popup = initPopup(professor);
-    profContainer.appendChild(popup);
-    profContainer.classList.add(POPUP_PARENT_CONTAINER_CLASS);
   });
 }
+var oneProfessor = async (section) => {
+  var _a;
+  const professor = await findProfessor((_a = section.textContent) != null ? _a : "");
+  const profContainer = section.parentNode.parentNode;
+  if (!professor || profContainer.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+    return;
+  }
+  const popup = initPopup(professor);
+  profContainer.appendChild(popup);
+  profContainer.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+};
+var multipleProfessors = async (section, professorList) => {
+  const validProfessors = professorList.map(async (professorName) => await findProfessor(professorName != null ? professorName : "") != void 0);
+  if (section.innerText == "") {
+    const sectionChildren = [...Array.from(section.children)];
+    const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
+    if (popupsCreated == validProfessors.length) {
+      section.innerText = "";
+      return;
+    }
+  }
+  professorList.forEach(async (professorName) => {
+    const professor = await findProfessor(professorName != null ? professorName : "");
+    if (section.children.length <= professorList.length) {
+      let uniqueProfessorSpan = document.createElement("span");
+      uniqueProfessorSpan.innerHTML = `${professorName}<br>`;
+      section.appendChild(uniqueProfessorSpan);
+      if (professor) {
+        uniqueProfessorSpan.style.cssText += "background-color: #D4E9B8; margin-bottom: 4px;";
+        const popup = initPopup(professor);
+        uniqueProfessorSpan.appendChild(popup);
+        uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+      }
+    }
+  });
+  section.innerText = "";
+};
 
 // src/main.ts
 var main = async () => {
