@@ -34,6 +34,7 @@ const multipleProfessors = async (section: HTMLElement, professorList: Array<str
   const validProfessors = professorList.map(
     async (professorName: string) => (await findProfessor(professorName ?? "")) != undefined
   );
+
   if (section.innerText == "") {
     const sectionChildren = [...Array.from(section.children)];
     const popupsCreated = sectionChildren.filter((child) =>
@@ -41,10 +42,10 @@ const multipleProfessors = async (section: HTMLElement, professorList: Array<str
     ).length;
 
     if (popupsCreated == validProfessors.length) {
-      section.innerText = "";
       return;
     }
   }
+
   professorList.forEach(async (professorName) => {
     const professor = await findProfessor(professorName ?? "");
     if (section.children.length <= professorList.length) {
@@ -54,12 +55,12 @@ const multipleProfessors = async (section: HTMLElement, professorList: Array<str
 
       // append popup to container
       if (professor) {
-        uniqueProfessorSpan.style.cssText += "background-color: #D4E9B8; margin-bottom: 4px;";
         const popup = initPopup(professor);
         uniqueProfessorSpan.appendChild(popup);
         uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
       }
     }
   });
+
   section.innerText = "";
 };

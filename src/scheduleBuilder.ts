@@ -31,82 +31,46 @@ export const scheduleBuilder = () => {
 
 const handleSmallTargets = (targets: Array<HTMLElement>) => {
   targets.forEach(async (section) => {
-    console.log(section.innerText);
-    // if (section.innerText == "") {
-    //   return;
-    // }
+    console.log(section.innerHTML);
 
     const professorList = [
       ...new Set((section.textContent ?? "").split(",").map((element) => element.trim())),
     ];
 
-    // console.log(professorList);
     const validProfessors = professorList.map(
       async (professorName: string) => (await findProfessor(professorName ?? "")) != undefined
     );
-    // if (section.children.length == professorList.length) {
-    //   section.textContent = "";
-    //   return;
-    // }
 
+    // if (section.innerText == "") {
     const sectionChildren = [...Array.from(section.children)];
     const popupsCreated = sectionChildren.filter((child) =>
       child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)
     ).length;
 
     if (popupsCreated == validProfessors.length) {
-      section.innerText = "";
       return;
     }
-
-    // section.innerText = "";
+    // }
 
     professorList.forEach(async (professorName) => {
       const professor = await findProfessor(professorName ?? "");
-      let uniqueProfessorDiv = document.createElement("div");
-      uniqueProfessorDiv.innerText = professorName;
+      if (section.children.length <= professorList.length) {
+        let uniqueProfessorSpan = document.createElement("span");
+        uniqueProfessorSpan.innerHTML = `${professorName}<br>`;
+        section.appendChild(uniqueProfessorSpan);
 
-      //   const sectionChildren = [...Array.from(section.children)];
-      //   let popupsCreated = 0;
-      //   sectionChildren.forEach((child) => {
-      //     if (child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
-      //         popupsCreated += 1;
-      //     } s
-      //   });
-
-      //   <dd class="cx-MuiTypography-root css-1xnpogb d-flex align-items-center pb-1 pr-1 cx-MuiTypography-body1"></dd>;
-
-      //   while (popupsCreated != )
-
-      //   if (section.children.length == professorList.length * 2) {
-      //     section.innerText = "";
-      //     return;
-      //   }
-
-      if (section.children.length < validProfessors.length) {
-        section.appendChild(uniqueProfessorDiv);
+        // append popup to container
         if (professor) {
+          //   uniqueProfessorSpan.style.cssText += "background-color: #D4E9B8; margin-bottom: 4px;";
+
           const popup = initPopup(professor);
-          //   section.innerHTML += `<span class=${POPUP_PARENT_CONTAINER_CLASS}>${professorName}</span>`;
-          //   uniqueProfessorSpan.innerText = section.innerText;
-          uniqueProfessorDiv.appendChild(popup);
-          uniqueProfessorDiv.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+          uniqueProfessorSpan.appendChild(popup);
+          uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
         }
       }
-      // uniqueProfessorSpan.innerText = section.innerText;
-      // if (professor) {
-      //   const popup = initPopup(professor);
-      //   uniqueProfessorSpan.appendChild(popup);
-      //   uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-      // }
-      // section.appendChild(uniqueProfessorSpan);
-      // if (section.children.length != professorList.length * 2 - 1) {
-      //   let comma = document.createElement("span");
-      //   comma.innerText = ",\u00A0";
-      //   section.appendChild(comma);
-      // }
-      //   }
     });
+
+    section.innerHTML = section.innerHTML.substring(0, section.innerHTML.indexOf("<"));
   });
 };
 

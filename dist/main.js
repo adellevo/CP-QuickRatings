@@ -87,7 +87,7 @@ var scheduleBuilder = () => {
 var handleSmallTargets = (targets) => {
   targets.forEach(async (section) => {
     var _a;
-    console.log(section.innerText);
+    console.log(section.innerHTML);
     const professorList = [
       ...new Set(((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
     ];
@@ -95,22 +95,22 @@ var handleSmallTargets = (targets) => {
     const sectionChildren = [...Array.from(section.children)];
     const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
     if (popupsCreated == validProfessors.length) {
-      section.innerText = "";
       return;
     }
     professorList.forEach(async (professorName) => {
       const professor = await findProfessor(professorName != null ? professorName : "");
-      let uniqueProfessorDiv = document.createElement("div");
-      uniqueProfessorDiv.innerText = professorName;
-      if (section.children.length < validProfessors.length) {
-        section.appendChild(uniqueProfessorDiv);
+      if (section.children.length <= professorList.length) {
+        let uniqueProfessorSpan = document.createElement("span");
+        uniqueProfessorSpan.innerHTML = `${professorName}<br>`;
+        section.appendChild(uniqueProfessorSpan);
         if (professor) {
           const popup = initPopup(professor);
-          uniqueProfessorDiv.appendChild(popup);
-          uniqueProfessorDiv.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+          uniqueProfessorSpan.appendChild(popup);
+          uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
         }
       }
     });
+    section.innerHTML = section.innerHTML.substring(0, section.innerHTML.indexOf("<"));
   });
 };
 var handleLargeUnexpandedTargets = (targets) => {
@@ -183,7 +183,6 @@ var multipleProfessors = async (section, professorList) => {
     const sectionChildren = [...Array.from(section.children)];
     const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
     if (popupsCreated == validProfessors.length) {
-      section.innerText = "";
       return;
     }
   }
@@ -194,7 +193,6 @@ var multipleProfessors = async (section, professorList) => {
       uniqueProfessorSpan.innerHTML = `${professorName}<br>`;
       section.appendChild(uniqueProfessorSpan);
       if (professor) {
-        uniqueProfessorSpan.style.cssText += "background-color: #D4E9B8; margin-bottom: 4px;";
         const popup = initPopup(professor);
         uniqueProfessorSpan.appendChild(popup);
         uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
