@@ -1,6 +1,13 @@
 const fs = require("fs");
 
-const enableWatcher = process.argv.includes("-dev");
+function copyAssets() {
+  const publicFiles = fs.readdirSync("public");
+  for (let file of publicFiles) {
+    fs.copyFileSync(`public/${file}`, `dist/${file}`);
+  }
+}
+
+const enableWatcher = process.argv.includes("-dev") ? { onRebuild: copyAssets } : false;
 
 require("esbuild")
   .build({
@@ -12,7 +19,5 @@ require("esbuild")
   })
   .catch(() => process.exit(1));
 
-const publicFiles = fs.readdirSync("public");
-for (let file of publicFiles) {
-  fs.copyFileSync(`public/${file}`, `dist/${file}`);
-}
+// Copy assets on first build
+copyAssets();
