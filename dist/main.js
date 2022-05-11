@@ -87,14 +87,13 @@ var scheduleBuilder = () => {
 var handleSmallTargets = (targets) => {
   targets.forEach(async (section) => {
     var _a;
-    console.log(section.innerHTML);
     const professorList = [
       ...new Set(((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
     ];
     const validProfessors = professorList.map(async (professorName) => await findProfessor(professorName != null ? professorName : "") != void 0);
     const sectionChildren = [...Array.from(section.children)];
     const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
-    if (popupsCreated == validProfessors.length) {
+    if (popupsCreated >= validProfessors.length) {
       return;
     }
     professorList.forEach(async (professorName) => {

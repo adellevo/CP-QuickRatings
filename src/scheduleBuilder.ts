@@ -31,26 +31,23 @@ export const scheduleBuilder = () => {
 
 const handleSmallTargets = (targets: Array<HTMLElement>) => {
   targets.forEach(async (section) => {
-    console.log(section.innerHTML);
-
     const professorList = [
-      ...new Set((section.textContent ?? "").split(",").map((element) => element.trim())),
+      ...new Set(
+        (section.textContent ?? "").split(",").map((element) => element.trim())
+      ),
     ];
-
     const validProfessors = professorList.map(
-      async (professorName: string) => (await findProfessor(professorName ?? "")) != undefined
+      async (professorName: string) =>
+        (await findProfessor(professorName ?? "")) != undefined
     );
-
-    // if (section.innerText == "") {
     const sectionChildren = [...Array.from(section.children)];
     const popupsCreated = sectionChildren.filter((child) =>
       child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)
     ).length;
 
-    if (popupsCreated == validProfessors.length) {
+    if (popupsCreated >= validProfessors.length) {
       return;
     }
-    // }
 
     professorList.forEach(async (professorName) => {
       const professor = await findProfessor(professorName ?? "");
@@ -70,32 +67,18 @@ const handleSmallTargets = (targets: Array<HTMLElement>) => {
       }
     });
 
-    section.innerHTML = section.innerHTML.substring(0, section.innerHTML.indexOf("<"));
+    section.innerHTML = section.innerHTML.substring(
+      0,
+      section.innerHTML.indexOf("<")
+    );
   });
 };
 
-//       if (i == 0) section.innerText = ""; // remove initial text with all profs combined together
-//       let uniqueProf = document.createElement("span"); // create span for individual profs
-
-//       } else if (platform == "SB") {
-//         // if (section.children.length < profArr.length * 2) {
-//         //   if (prof !== undefined) {
-//         //     const link = getProfLink(prof);
-//         //     uniqueProf.innerHTML = `<a href='${link}' target='_blank'>${professorName}</a>`;
-//         //   } else {
-//         //     uniqueProf.innerHTML = `${professorName}`;
-//         //   }
-//         //   section.appendChild(uniqueProf);
-//         //   if (section.children.length != profArr.length * 2 - 1) {
-//         //     let comma = document.createElement("span");
-//         //     comma.innerText = ",\u00A0";
-//         //     section.appendChild(comma);
-//         //   }
-//         // }
-
 const handleLargeUnexpandedTargets = (targets: Array<HTMLElement>) => {
   targets.forEach(async (section) => {
-    const professorList = (section.textContent ?? "").split(",").map((element) => element.trim());
+    const professorList = (section.textContent ?? "")
+      .split(",")
+      .map((element) => element.trim());
 
     // set background color to prompt for expansion
     professorList.forEach(async (professorName) => {
@@ -110,7 +93,9 @@ const handleLargeUnexpandedTargets = (targets: Array<HTMLElement>) => {
 
 const handleLargeExpandedTargets = (targets: Array<HTMLElement>) => {
   targets.forEach(async (section) => {
-    const professorList = (section.textContent ?? "").split(",").map((element) => element.trim());
+    const professorList = (section.textContent ?? "")
+      .split(",")
+      .map((element) => element.trim());
     const sectionChildren = [...Array.from(section.children)];
 
     professorList.forEach(async (professorName) => {
@@ -123,7 +108,10 @@ const handleLargeExpandedTargets = (targets: Array<HTMLElement>) => {
       }
 
       // add popup if it doesn't already exist
-      if (targetChild && !targetChild.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+      if (
+        targetChild &&
+        !targetChild.classList.contains(POPUP_PARENT_CONTAINER_CLASS)
+      ) {
         const professor = await findProfessor(professorName ?? "");
         if (professor) {
           const popup = initPopup(professor);

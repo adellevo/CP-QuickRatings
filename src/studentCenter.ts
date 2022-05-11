@@ -4,10 +4,14 @@ import { POPUP_PARENT_CONTAINER_CLASS } from "./popup";
 import { Teacher } from "@polyratings/client";
 
 export function studentCenter() {
-  const sectionArr = document.querySelectorAll<HTMLElement>('span[id*="MTG_INSTR$"]'); // array of sections
+  const sectionArr = document.querySelectorAll<HTMLElement>(
+    'span[id*="MTG_INSTR$"]'
+  ); // array of sections
   sectionArr.forEach(async (section) => {
     const professorList = [
-      ...new Set((section.textContent ?? "").split(",").map((element) => element.trim())),
+      ...new Set(
+        (section.textContent ?? "").split(",").map((element) => element.trim())
+      ),
     ];
 
     if (professorList.length == 1) {
@@ -21,7 +25,10 @@ export function studentCenter() {
 const oneProfessor = async (section: HTMLElement) => {
   const professor = await findProfessor(section.textContent ?? "");
   const profContainer = section!.parentNode!.parentNode! as HTMLElement;
-  if (!professor || profContainer.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+  if (
+    !professor ||
+    profContainer.classList.contains(POPUP_PARENT_CONTAINER_CLASS)
+  ) {
     // Can't do anything since we did not find a professor or we already added the popup
     return;
   }
@@ -30,9 +37,13 @@ const oneProfessor = async (section: HTMLElement) => {
   profContainer.classList.add(POPUP_PARENT_CONTAINER_CLASS);
 };
 
-const multipleProfessors = async (section: HTMLElement, professorList: Array<string>) => {
+const multipleProfessors = async (
+  section: HTMLElement,
+  professorList: Array<string>
+) => {
   const validProfessors = professorList.map(
-    async (professorName: string) => (await findProfessor(professorName ?? "")) != undefined
+    async (professorName: string) =>
+      (await findProfessor(professorName ?? "")) != undefined
   );
 
   if (section.innerText == "") {
