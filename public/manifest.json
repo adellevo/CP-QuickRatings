@@ -1,0 +1,23 @@
+{
+  "name": "Polyratings Test",
+  "version": "2.1",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "description": "Easily view Polyratings data in Student Center",
+  "content_scripts": [
+    {
+      "matches": ["https://cmsweb.pscs.calpoly.edu/*"],
+      "all_frames": true,
+      "css": ["main.css"],
+      "js": ["main.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "host_permissions": [
+    "https://api.github.com/repos/Polyratings/Polyratings-data/contents/professor-list.json?ref=data"
+  ],
+  "manifest_version": 3
+}
