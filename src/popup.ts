@@ -1,12 +1,13 @@
 import type { Teacher } from "@polyratings/client";
 export const POPUP_PARENT_CONTAINER_CLASS = "polyratings-popup-container";
+export const POPUP_CLASS = "polyratings-popup";
 
 export const initPopup = (prof: Teacher): HTMLElement => {
   // create popup
   const tempDiv = document.createElement("div");
 
   const popupHtml = `
-  <div class="polyratings-popup">
+  <div class="${POPUP_CLASS}">
   <div>
   <h1>${prof.firstName} ${prof.lastName}</h1>
   <p>Based on ${prof.numEvals} ${prof.numEvals == 1 ? "rating" : "ratings"}..</p>

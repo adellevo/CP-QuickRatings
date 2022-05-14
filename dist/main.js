@@ -1,9 +1,10 @@
 // src/popup.ts
 var POPUP_PARENT_CONTAINER_CLASS = "polyratings-popup-container";
+var POPUP_CLASS = "polyratings-popup";
 var initPopup = (prof) => {
   const tempDiv = document.createElement("div");
   const popupHtml = `
-  <div class="polyratings-popup">
+  <div class="${POPUP_CLASS}">
   <div>
   <h1>${prof.firstName} ${prof.lastName}</h1>
   <p>Based on ${prof.numEvals} ${prof.numEvals == 1 ? "rating" : "ratings"}..</p>
@@ -85,68 +86,68 @@ var scheduleBuilder = () => {
   }
 };
 var handleSmallTargets = (targets) => {
-  targets.forEach(async (section) => {
+  targets.forEach(async (target) => {
     var _a;
-    const professorList = [
-      ...new Set(((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
+    target.style.overflow = "visible";
+    const professorNameList = [
+      ...new Set(((_a = target.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
     ];
-    const validProfessors = professorList.map(async (professorName) => await findProfessor(professorName != null ? professorName : "") != void 0);
-    const sectionChildren = [...Array.from(section.children)];
-    const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
-    if (popupsCreated >= validProfessors.length) {
+    const sectionChildren = [...Array.from(target.children)];
+    const isPopupCreated = sectionChildren.find((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS));
+    if (isPopupCreated) {
       return;
     }
-    professorList.forEach(async (professorName) => {
-      const professor = await findProfessor(professorName != null ? professorName : "");
-      if (section.children.length <= professorList.length) {
-        let uniqueProfessorSpan = document.createElement("span");
-        uniqueProfessorSpan.innerHTML = `${professorName}<br>`;
-        section.appendChild(uniqueProfessorSpan);
-        if (professor) {
-          const popup = initPopup(professor);
-          uniqueProfessorSpan.appendChild(popup);
-          uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-        }
+    const newHtml = await Promise.all(professorNameList.map(async (professorName) => {
+      const professor = await findProfessor(professorName);
+      if (!professor) {
+        return `<span>${professorName}</span>`;
       }
-    });
-    section.innerHTML = section.innerHTML.substring(0, section.innerHTML.indexOf("<"));
+      const popup = initPopup(professor);
+      return `<span class="${POPUP_PARENT_CONTAINER_CLASS}">
+          ${professorName}
+        <div class="${POPUP_CLASS}">${popup.innerHTML}</div></span>`;
+    }));
+    target.innerHTML = newHtml.join("");
   });
 };
 var handleLargeUnexpandedTargets = (targets) => {
-  targets.forEach(async (section) => {
+  targets.forEach(async (target) => {
     var _a;
-    const professorList = ((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim());
-    professorList.forEach(async (professorName) => {
-      const professor = await findProfessor(professorName != null ? professorName : "");
-      if (professor) {
-        section.style.cssText += "background-color: #D4E9B8";
-        return;
+    if (target.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+      return;
+    }
+    const professorNameList = ((_a = target.textContent) != null ? _a : "").split(",").map((element) => element.trim());
+    const firstProfessorName = professorNameList[0];
+    const professor = await findProfessor(firstProfessorName != null ? firstProfessorName : "");
+    if (professor) {
+      const popup = initPopup(professor);
+      target.appendChild(popup);
+      target.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+      return;
+    }
+    professorNameList.forEach(async (professorName) => {
+      const professor2 = await findProfessor(professorName != null ? professorName : "");
+      if (professor2) {
+        target.style.cssText += "background-color: #D4E9B8";
       }
     });
   });
 };
 var handleLargeExpandedTargets = (targets) => {
-  targets.forEach(async (section) => {
-    var _a;
-    const professorList = ((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim());
-    const sectionChildren = [...Array.from(section.children)];
-    professorList.forEach(async (professorName) => {
-      let targetChild;
-      for (let i = 0; i < sectionChildren.length; i++) {
-        if (sectionChildren[i].innerText == professorName) {
-          targetChild = sectionChildren[i];
-          break;
-        }
+  targets.forEach(async (target) => {
+    const sectionChildren = [...Array.from(target.children)];
+    const newChildren = await Promise.all(sectionChildren.map(async (child) => {
+      var _a;
+      const professor = await findProfessor((_a = child.innerText) != null ? _a : "");
+      if (!professor || child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+        return child;
       }
-      if (targetChild && !targetChild.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
-        const professor = await findProfessor(professorName != null ? professorName : "");
-        if (professor) {
-          const popup = initPopup(professor);
-          targetChild.appendChild(popup);
-          targetChild.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-        }
-      }
-    });
+      const popup = initPopup(professor);
+      child.appendChild(popup);
+      child.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+      return child;
+    }));
+    target.replaceChildren(...newChildren);
   });
 };
 
@@ -154,51 +155,34 @@ var handleLargeExpandedTargets = (targets) => {
 function studentCenter() {
   const sectionArr = document.querySelectorAll('span[id*="MTG_INSTR$"]');
   sectionArr.forEach(async (section) => {
-    var _a;
+    var _a, _b;
+    const hasPopups = (_a = section.parentElement) == null ? void 0 : _a.querySelector(`.${POPUP_PARENT_CONTAINER_CLASS}`);
+    if (hasPopups) {
+      return;
+    }
     const professorList = [
-      ...new Set(((_a = section.textContent) != null ? _a : "").split(",").map((element) => element.trim()))
+      ...new Set(((_b = section.textContent) != null ? _b : "").split(",").map((element) => element.trim()))
     ];
     if (professorList.length == 1) {
-      oneProfessor(section);
+      const profContainer = section.parentNode;
+      multipleProfessors(profContainer, professorList);
     } else {
       multipleProfessors(section, professorList);
     }
   });
 }
-var oneProfessor = async (section) => {
-  var _a;
-  const professor = await findProfessor((_a = section.textContent) != null ? _a : "");
-  const profContainer = section.parentNode.parentNode;
-  if (!professor || profContainer.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
-    return;
-  }
-  const popup = initPopup(professor);
-  profContainer.appendChild(popup);
-  profContainer.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-};
-var multipleProfessors = async (section, professorList) => {
-  const validProfessors = professorList.map(async (professorName) => await findProfessor(professorName != null ? professorName : "") != void 0);
-  if (section.innerText == "") {
-    const sectionChildren = [...Array.from(section.children)];
-    const popupsCreated = sectionChildren.filter((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)).length;
-    if (popupsCreated == validProfessors.length) {
-      return;
+var multipleProfessors = async (target, professorNameList) => {
+  const newHtml = await Promise.all(professorNameList.map(async (professorName) => {
+    const professor = await findProfessor(professorName);
+    if (!professor) {
+      return `<span>${professorName}</span>`;
     }
-  }
-  professorList.forEach(async (professorName) => {
-    const professor = await findProfessor(professorName != null ? professorName : "");
-    if (section.children.length <= professorList.length) {
-      let uniqueProfessorSpan = document.createElement("span");
-      uniqueProfessorSpan.innerHTML = `${professorName}<br>`;
-      section.appendChild(uniqueProfessorSpan);
-      if (professor) {
-        const popup = initPopup(professor);
-        uniqueProfessorSpan.appendChild(popup);
-        uniqueProfessorSpan.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-      }
-    }
-  });
-  section.innerText = "";
+    const popup = initPopup(professor);
+    return `<span class="${POPUP_PARENT_CONTAINER_CLASS}">
+        ${professorName}
+      <div class="${POPUP_CLASS}">${popup.innerHTML}</div></span>`;
+  }));
+  target.innerHTML = newHtml.join("");
 };
 
 // src/main.ts
