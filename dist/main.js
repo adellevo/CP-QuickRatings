@@ -35,7 +35,7 @@ var initPopup = (prof) => {
   </div>
   <div class="polyratings-popup-btn">
   <a
-      href="https://Polyratings.dev/professor/${prof.id}"
+      href="https://polyratings.org/professor/${prof.id}"
       target="_blank"
   >
       View on Polyratings
@@ -100,10 +100,10 @@ var handleSmallTargets = (targets) => {
     const newHtml = await Promise.all(professorNameList.map(async (professorName) => {
       const professor = await findProfessor(professorName);
       if (!professor) {
-        return `<span>${professorName}</span>`;
+        return `<span style="display:inline-block;padding-right:12px">${professorName}</span>`;
       }
       const popup = initPopup(professor);
-      return `<span class="${POPUP_PARENT_CONTAINER_CLASS}">
+      return `<span style="margin-right:10px" class="${POPUP_PARENT_CONTAINER_CLASS}">
           ${professorName}
         <div class="${POPUP_CLASS}">${popup.innerHTML}</div></span>`;
     }));
@@ -136,18 +136,20 @@ var handleLargeUnexpandedTargets = (targets) => {
 var handleLargeExpandedTargets = (targets) => {
   targets.forEach(async (target) => {
     const sectionChildren = [...Array.from(target.children)];
-    const newChildren = await Promise.all(sectionChildren.map(async (child) => {
-      var _a;
-      const professor = await findProfessor((_a = child.innerText) != null ? _a : "");
-      if (!professor || child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+    const popupsAlreadyCreated = sectionChildren.find((child) => child.classList.contains(POPUP_PARENT_CONTAINER_CLASS));
+    if (popupsAlreadyCreated) {
+      const newChildren = await Promise.all(sectionChildren.map(async (child) => {
+        var _a;
+        const professor = await findProfessor((_a = child.innerText) != null ? _a : "");
+        if (professor) {
+          const popup = initPopup(professor);
+          child.appendChild(popup);
+          child.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+        }
         return child;
-      }
-      const popup = initPopup(professor);
-      child.appendChild(popup);
-      child.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-      return child;
-    }));
-    target.replaceChildren(...newChildren);
+      }));
+      target.replaceChildren(...newChildren);
+    }
   });
 };
 
@@ -175,7 +177,7 @@ var multipleProfessors = async (target, professorNameList) => {
   const newHtml = await Promise.all(professorNameList.map(async (professorName) => {
     const professor = await findProfessor(professorName);
     if (!professor) {
-      return `<span>${professorName}</span>`;
+      return `<span style="display:inline-block;padding-right:12px;margin-bottom:3px">${professorName}</span>`;
     }
     const popup = initPopup(professor);
     return `<span class="${POPUP_PARENT_CONTAINER_CLASS}">

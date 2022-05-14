@@ -38,7 +38,7 @@ export const initPopup = (prof: Teacher): HTMLElement => {
   </div>
   <div class="polyratings-popup-btn">
   <a
-      href="https://Polyratings.dev/professor/${prof.id}"
+      href="https://polyratings.org/professor/${prof.id}"
       target="_blank"
   >
       View on Polyratings

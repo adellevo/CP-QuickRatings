@@ -29,7 +29,7 @@ const multipleProfessors = async (target: HTMLElement, professorNameList: string
     professorNameList.map(async (professorName) => {
       const professor = await findProfessor(professorName);
       if (!professor) {
-        return `<span>${professorName}</span>`;
+        return `<span style="display:inline-block;padding-right:12px;margin-bottom:3px">${professorName}</span>`;
       }
       const popup = initPopup(professor);
       return `<span class="${POPUP_PARENT_CONTAINER_CLASS}">

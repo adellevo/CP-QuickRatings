@@ -1,6 +1,6 @@
 :root {
   --polyratingsPopupGreen: #1f4715;
-  --polyratingsPopupGold: #bd8b13;
+  /* --polyratingsPopupGold: #bd8b13; */
   --polyratingsPopupGray: #494a45;
 }
 
@@ -23,11 +23,11 @@
   padding: 6px;
   color: var(--polyratingsPopupGray);
   text-align: center;
-  border: 4px solid var(--polyratingsPopupGold);
+  border: 4px solid white;
   border-radius: 8px;
   top: -4px;
   left: 100%;
-  margin-left: 2px;
+  margin-left: -8px;
 }
 
 .polyratings-popup-container:hover .polyratings-popup {
@@ -41,9 +41,12 @@
 }
 
 .polyratings-popup-container {
+  display: inline-block;
   position: relative;
   overflow: visible !important;
-  margin-right: 10px;
+  padding-right: 12px;
+  /* margin-right: 10px; */
+  margin-bottom: 3px;
   background-color: #d4e9b8 !important;
   /* margin-bottom: -10px; */
   /* --red: 0;

@@ -1,7 +1,6 @@
 import { initPopup, POPUP_CLASS } from "./popup";
 import { findProfessor } from "./professors";
 import { POPUP_PARENT_CONTAINER_CLASS } from "./popup";
-import { Teacher } from "@polyratings/client";
 
 export const scheduleBuilder = () => {
   const SmallTargets = document.querySelectorAll<HTMLElement>(
@@ -48,10 +47,10 @@ const handleSmallTargets = (targets: Array<HTMLElement>) => {
       professorNameList.map(async (professorName) => {
         const professor = await findProfessor(professorName);
         if (!professor) {
-          return `<span>${professorName}</span>`;
+          return `<span style="display:inline-block;padding-right:12px">${professorName}</span>`;
         }
         const popup = initPopup(professor);
-        return `<span class="${POPUP_PARENT_CONTAINER_CLASS}">
+        return `<span style="margin-right:10px" class="${POPUP_PARENT_CONTAINER_CLASS}">
           ${professorName}
         <div class="${POPUP_CLASS}">${popup.innerHTML}</div></span>`;
       })
@@ -60,7 +59,7 @@ const handleSmallTargets = (targets: Array<HTMLElement>) => {
   });
 };
 
-const handleLargeUnexpandedTargets = (targets: Array<HTMLElement>) => {
+const handleLargeUnexpandedTargets = (targets: HTMLElement[]) => {
   targets.forEach(async (target) => {
     if (target.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
       return;
@@ -89,23 +88,29 @@ const handleLargeUnexpandedTargets = (targets: Array<HTMLElement>) => {
   });
 };
 
-const handleLargeExpandedTargets = (targets: Array<HTMLElement>) => {
+const handleLargeExpandedTargets = (targets: HTMLElement[]) => {
   targets.forEach(async (target) => {
     const sectionChildren = [...Array.from(target.children)] as HTMLElement[];
 
-    const newChildren = await Promise.all(
-      sectionChildren.map(async (child) => {
-        const professor = await findProfessor(child.innerText ?? "");
-        if (!professor || child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
-          return child;
-        }
-        const popup = initPopup(professor);
-        child.appendChild(popup);
-        child.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-        return child;
-      })
+    // avoid replacing existing popups
+    const popupsAlreadyCreated = sectionChildren.find((child) =>
+      child.classList.contains(POPUP_PARENT_CONTAINER_CLASS)
     );
+    if (popupsAlreadyCreated) {
+      const newChildren = await Promise.all(
+        sectionChildren.map(async (child) => {
+          const professor = await findProfessor(child.innerText ?? "");
+          // append popup to child if necessary
+          if (professor) {
+            const popup = initPopup(professor);
+            child.appendChild(popup);
+            child.classList.add(POPUP_PARENT_CONTAINER_CLASS);
+          }
+          return child;
+        })
+      );
 
-    target.replaceChildren(...newChildren);
+      target.replaceChildren(...newChildren);
+    }
   });
 };
