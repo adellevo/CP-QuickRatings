@@ -1,4 +1,4 @@
-# Polyratings Chrome Extension (3.0)
+# CP QuickRatings (3.0)
 
 ### How it works
 
