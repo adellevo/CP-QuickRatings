@@ -5,27 +5,23 @@ import { Teacher } from "@polyratings/client";
 
 export function studentCenter() {
   const sectionArr = document.querySelectorAll<HTMLElement>('span[id*="MTG_INSTR$"]'); // array of sections
-  sectionArr.forEach(async (section) => {
+  sectionArr.forEach(async (target) => {
     // Go one up to catch the single professor case
-    const hasPopups = section.parentElement?.querySelector(`.${POPUP_PARENT_CONTAINER_CLASS}`);
-    if (hasPopups) {
-      return;
-    }
-    const professorList = [
-      ...new Set((section.textContent ?? "").split(",").map((element) => element.trim())),
-    ];
+    const hasPopups = target.parentElement?.querySelector(`.${POPUP_PARENT_CONTAINER_CLASS}`);
+    if (!hasPopups) {
+      const professorNameList = [
+        ...new Set((target.textContent ?? "").split(",").map((element) => element.trim())),
+      ];
 
-    if (professorList.length == 1) {
-      const profContainer = section!.parentNode! as HTMLElement;
-      multipleProfessors(profContainer, professorList);
-    } else {
-      multipleProfessors(section, professorList);
+      const professorContainer =
+        professorNameList.length == 1 ? (target!.parentNode! as HTMLElement) : target;
+      createPopups(professorContainer, professorNameList);
     }
   });
 }
 
-const multipleProfessors = async (target: HTMLElement, professorNameList: string[]) => {
-  const newHtml = await Promise.all(
+const createPopups = async (target: HTMLElement, professorNameList: string[]) => {
+  const newHTML = await Promise.all(
     professorNameList.map(async (professorName) => {
       const professor = await findProfessor(professorName);
       if (!professor) {
@@ -37,5 +33,5 @@ const multipleProfessors = async (target: HTMLElement, professorNameList: string
       <div class="${POPUP_CLASS}">${popup.innerHTML}</div></span>`;
     })
   );
-  target.innerHTML = newHtml.join("");
+  target.innerHTML = newHTML.join("");
 };
