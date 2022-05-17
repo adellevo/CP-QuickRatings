@@ -1,15 +1,15 @@
-# CP QuickRatings (3.0)
+# CP QuickRatings (3.1)
 
 ### How it works
 
-To activate the extension, [install](https://chrome.google.com/webstore/detail/Polyratings/pliinobghndmnnjenolmokefjacnmdpo?hl=en&authuser=1) it, and log into Student Center. Once you've enabled the extension, you will see that some professors' names are highlighted in green, which indicates that they have existing Polyratings data. Hovering over any highlighted name will trigger a popup that displays an overview of the corresponding professor's ratings, as well as a button to visit that professor's Polyratings page, where you can read full reviews.
+Once you've [installed](https://chrome.google.com/webstore/detail/Polyratings/pliinobghndmnnjenolmokefjacnmdpo?hl=en&authuser=1) the extension, log in to Student Center to activate it. You will see that some professors' names are highlighted in green, which indicates that they have existing Polyratings data. Hovering over any highlighted name will trigger a popup that displays an overview of the corresponding professor's ratings, as well as a button to visit that professor's Polyratings page, where you can read full reviews.
 
 #### Viewing classes through the "Search for Classes" or "Enroll" filters
 
 <img src="https://github.com/adellevo/polyratings/blob/main/images/sc.png" width="600">
 
 #### Viewing classes on Schedule Builder
-When a course is taught by multiple professors, hovering over a highlighted name on the unexpanded dropdown will only trigger a popup if the first professor has Polyratings data. Expanding the dropdown will allow you to access the other professors' data. 
+Hovering over a highlighted name on an unexpanded dropdown will not trigger a popup — the green highlight is only meant to prompt you to expand the dropdown, which will then allow you to view all the professors and their corresponding popups.
 
 > Smaller browser widths
 <img src="https://github.com/adellevo/polyratings/blob/main/images/sbw-sb.png" width="600">
