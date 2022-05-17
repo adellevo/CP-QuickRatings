@@ -61,28 +61,23 @@ const handleSmallTargets = (targets: Array<HTMLElement>) => {
 
 const handleLargeUnexpandedTargets = (targets: HTMLElement[]) => {
   targets.forEach(async (target) => {
-    // if (target.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
-    //   return;
-    // }
+    if (target.classList.contains(POPUP_PARENT_CONTAINER_CLASS)) {
+      return;
+    }
 
     const professorNameList = (target.textContent ?? "")
       .split(",")
       .map((element) => element.trim());
 
-    // set background color to prompt for expansion if first professor is not found but others are
-    professorNameList.forEach(async (professorName, index) => {
+    // set background color to prompt for expansion
+    for (let i = 0; i < professorNameList.length; i++) {
+      const professorName = professorNameList[i];
       const professor = await findProfessor(professorName ?? "");
       if (professor) {
-        // append popup if first professor in list has data
-        // if (index == 0) {
-        //   const popup = initPopup(professor);
-        //   target.appendChild(popup);
-        //   target.classList.add(POPUP_PARENT_CONTAINER_CLASS);
-        //   return;
-        // }
         target.style.cssText += "background-color: #D4E9B8";
+        return;
       }
-    });
+    }
   });
 };
 
