@@ -38,4 +38,4 @@ export const getProfessorRatings = async () => {
 };
 
 // returns link to professor's rating page
-export const getProfLink = (prof: Teacher): string => `https://polyratings.dev/teacher/${prof.id}`;
+export const getProfLink = (prof: Teacher): string => `https://polyratings.dev/professor/${prof.id}`;
